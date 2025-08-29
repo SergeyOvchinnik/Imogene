@@ -13,9 +13,9 @@ public class Tester {
 
         BitMapImage image = null;
         try {
-            image = ImageRW.readImage("paint.png");
-            image = ImageUtils.paintCan(image, 482, 287, 255, 0, 0);
-            ImageRW.writeImage(image, "png", "paint2.png");
+            image = ImageRW.readImage("testy1.png");
+            image = ImageUtils.smoothFilter(image);
+            ImageRW.writeImage(image, "png", "testy1Smooth.png");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

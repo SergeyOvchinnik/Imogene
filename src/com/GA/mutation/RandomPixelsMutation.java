@@ -43,7 +43,7 @@ public class RandomPixelsMutation extends MutationFunction {
                 return out;
         }
         else {
-            return mutate(image);
+            return mutateAttempt(image);
         }
     }
 

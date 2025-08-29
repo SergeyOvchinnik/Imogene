@@ -3,19 +3,18 @@ package com.application;
 import com.GA.crossover.BitwiseCrossOver;
 import com.GA.crossover.CrossOverFunction;
 import com.GA.fitness.CheckerboardFitness;
-import com.GA.fitness.ColourFitness;
 import com.GA.GeneticAlgorithm;
 import com.GA.ImageGenerator;
 import com.GA.fitness.FitnessFunction;
+import com.GA.fitness.ImageLikenessFitness;
 import com.GA.generation.GenerationFunction;
 import com.GA.generation.RandomBitmapGeneration;
 import com.GA.generation.RandomColorGeneration;
-import com.GA.mutation.MutationFunction;
-import com.GA.mutation.PaintCanMutation;
-import com.GA.mutation.RandomPixelsMutation;
+import com.GA.mutation.*;
 import com.GA.selection.RouletteWheelSelection;
 import com.GA.selection.SelectionFunction;
 import com.utils.BitMapImage;
+import com.utils.ImageRW;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,15 +41,15 @@ public class Application {
     private static JPanel cards;
     private static DrawingPanel drawingPanel;
 
-    private static JPanel choiceScreen;
+    private static JPanel modeScreen;
     private static JPanel imageScreen;
 
     // TODO: move elsewhere
     public static final boolean UPSCALE = true;
     public static final int UPSCALE_FACTOR = 5;
 
-    public static int currentImageWidth = 50;
-    public static int currentImageHeight = 50;
+    public static int currentImageWidth = 100;
+    public static int currentImageHeight = 100;
 
     public static BitMapImage currentImage;
 
@@ -71,21 +70,21 @@ public class Application {
         layout = new CardLayout();
         cards = new JPanel(layout);
 
-        choiceScreen = createChoiceScreen();
+        modeScreen = createModeScreen();
         imageScreen = createImageScreen();
 
-        cards.add(choiceScreen, "Choice");
+        cards.add(modeScreen, "Mode");
         cards.add(imageScreen, "Image");
 
         frame.add(cards);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
-        layout.show(cards, "Choice");
+        layout.show(cards, "Mode");
 
     }
 
-    private static JPanel createChoiceScreen() {
+    private static JPanel createModeScreen() {
         JPanel choiceScreen = new JPanel(new GridBagLayout());
         JButton btnLocal = new JButton("Run locally");
         JButton btnRemote = new JButton("Run remotely");
@@ -139,17 +138,33 @@ public class Application {
                 int width = currentImageWidth;
                 int populationSize = 1000;
                 int generations = 1000;
-                int elite = 30;
-                int regeneration = 50;
-                GenerationFunction generationFunction = new RandomColorGeneration();
+                int elite = 5;
+                int regeneration = 30;
+                GenerationFunction generationFunction = new RandomBitmapGeneration();
+                //GenerationFunction generationFunction = new RandomColorGeneration();
                 FitnessFunction fitnessFunction = new CheckerboardFitness();
+                try {
+                    fitnessFunction = new ImageLikenessFitness(ImageRW.readImage("cat1.png"), height, width);
+                }
+                catch(Exception exception) {
+                    exception.printStackTrace();
+                    System.exit(0);
+                }
+
                 SelectionFunction selectionFunction = new RouletteWheelSelection();
                 selectionFunction.makeRanked();
                 CrossOverFunction crossOverFunction = new BitwiseCrossOver();
+                crossOverFunction.makeWeighted();
                 crossOverFunction.makeGreedy(3, fitnessFunction);
-                //MutationFunction mutationFunction = new RandomPixelsMutation(0.1, 0.1);
-                MutationFunction mutationFunction = new PaintCanMutation();
-                //mutationFunction.makeGreedy(5, fitnessFunction);
+                EnsembleMutation mutationFunction = new EnsembleMutation(fitnessFunction);
+                MutationFunction mutationFunction1 = new RandomPixelAdjustmentsMutation(3, 1.0, 0.1);
+                MutationFunction mutationFunction2 = new SmoothMutation(1.0, true, fitnessFunction);
+                MutationFunction mutationFunction3 = new RandomPixelsMutation(1.0, 0.1);
+                //MutationFunction mutationFunction = new RandomPixelsMutation(0.8, 0.1);
+                //MutationFunction mutationFunction = new PaintCanMutation();
+                mutationFunction1.makeGreedy(5, fitnessFunction);
+                mutationFunction.addFunction(mutationFunction1, 1.0);
+                mutationFunction.addFunction(mutationFunction2, 1.0);
 
                 GeneticAlgorithm ga = new GeneticAlgorithm(
                         height,
@@ -167,7 +182,7 @@ public class Application {
 
                 new Thread(() -> {
                     for(int i = 0; i < ga.generations; i++) {
-                        ga.step();
+                        ga.gaStep();
                         System.out.println("Step");
                         SwingUtilities.invokeLater(() -> {
                             currentImage = ga.best.getLast().getImage();
@@ -212,8 +227,8 @@ public class Application {
         imageScreen.add(drawingPanel);
         imageScreen.setVisible(true);
         int[][][] bitmap = image.getRgb();
-        for(int y = 0; y < Application.currentImageWidth; y++) {
-            for(int x = 0; x < Application.currentImageHeight; x++) {
+        for(int y = 0; y < currentImageHeight; y++) {
+            for(int x = 0; x < currentImageWidth; x++) {
                 drawPixel(x, y, new Color(bitmap[y][x][0], bitmap[y][x][1], bitmap[y][x][2]));
             }
         }
