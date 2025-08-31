@@ -9,45 +9,30 @@ import com.utils.Util;
  * A simple mutation function that replaces some of the pixels
  * with completely random colours.
  *
- * This mutation requires two parameters. The first parameter is
- * the probability that the mutation will be applied, e.g. if it
- * is set to 10% than only around 10% of the images will be
- * changed by this function. The second parameter is the pixel
- * probability, which determines how likely each individual
- * pixel is to be replaced when the mutation is applied, e.g.
- * if it is set to 10% than around 10% of all pixels will be
- * replaced with random colours.
+ * An additional parameter is added: the probability for each
+ * pixel to be altered.
+ *
+ * For example, if the probability is 0.1 then around 10% of the
+ * pixels of the image will have their rgb values randomised.
+ *
  */
 public class RandomPixelsMutation extends MutationFunction {
 
-    private double mutationProbability;
+    // Probability for each individual pixel to be altered
     private double mutationPixelProbability;
 
+    /**
+     * Constructor
+     *
+     * @param mutationProbability The probability of the mutation function being applied
+     * @param mutationPixelProbability Probability for each individual pixel to be altered
+     */
     public RandomPixelsMutation(double mutationProbability, double mutationPixelProbability) {
-        this.mutationProbability = mutationProbability;
+        super(mutationProbability);
         this.mutationPixelProbability = mutationPixelProbability;
     }
 
-    public IndividualImage mutate(IndividualImage image) {
-        if(greedy) {
-                IndividualImage out = mutateAttempt(image);
-                double bestFitness = fitnessFunction.fitness(out);
-                for(int i = 1; i < attempts; i++) {
-                    IndividualImage mutant = mutateAttempt(image);
-                    double fitness = fitnessFunction.fitness(mutant);
-                    if(fitness > bestFitness) {
-                        bestFitness = fitness;
-                        out = mutant;
-                    }
-                }
-                return out;
-        }
-        else {
-            return mutateAttempt(image);
-        }
-    }
-
-    public IndividualImage mutateAttempt(IndividualImage individualImage) {
+    protected IndividualImage mutationAttempt(IndividualImage individualImage) {
         int[][][] rgb = individualImage.getImage().getRgb();
         int[][][] rgbMutated = individualImage.copy().getImage().getRgb(); // TODO: strange implementation
 

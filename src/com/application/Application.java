@@ -1,15 +1,12 @@
 package com.application;
 
-import com.GA.crossover.BitwiseCrossOver;
-import com.GA.crossover.CrossOverFunction;
-import com.GA.fitness.CheckerboardFitness;
+import com.GA.crossover.PixelwiseCrossover;
+import com.GA.crossover.CrossoverFunction;
+import com.GA.fitness.*;
 import com.GA.GeneticAlgorithm;
 import com.GA.ImageGenerator;
-import com.GA.fitness.FitnessFunction;
-import com.GA.fitness.ImageLikenessFitness;
 import com.GA.generation.GenerationFunction;
 import com.GA.generation.RandomBitmapGeneration;
-import com.GA.generation.RandomColorGeneration;
 import com.GA.mutation.*;
 import com.GA.selection.RouletteWheelSelection;
 import com.GA.selection.SelectionFunction;
@@ -124,7 +121,7 @@ public class Application {
         btnRandom.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                BitMapImage image = ImageGenerator.randomPixels(currentImageWidth, currentImageHeight);
+                BitMapImage image = ImageGenerator.randomPixels(currentImageHeight, currentImageWidth);
                 paintImage(image);
 
             }
@@ -142,30 +139,36 @@ public class Application {
                 int regeneration = 30;
                 GenerationFunction generationFunction = new RandomBitmapGeneration();
                 //GenerationFunction generationFunction = new RandomColorGeneration();
-                FitnessFunction fitnessFunction = new CheckerboardFitness();
+                FitnessFunction fitnessFunction1 = new CheckerboardFitness();
                 try {
-                    fitnessFunction = new ImageLikenessFitness(ImageRW.readImage("cat1.png"), height, width);
+                    fitnessFunction1 = new ImageLikenessFitness(ImageRW.readImage("cat1.png"), height, width);
                 }
                 catch(Exception exception) {
                     exception.printStackTrace();
                     System.exit(0);
                 }
+                FitnessFunction fitnessFunction2 = new SmoothnessFitness();
+                EnsembleFitnessFunction fitnessFunction = new EnsembleFitnessFunction();
+                fitnessFunction.addFunction(fitnessFunction1, 1.0);
+                fitnessFunction.addFunction(fitnessFunction2, 0.1);
 
                 SelectionFunction selectionFunction = new RouletteWheelSelection();
                 selectionFunction.makeRanked();
-                CrossOverFunction crossOverFunction = new BitwiseCrossOver();
+                CrossoverFunction crossOverFunction = new PixelwiseCrossover();
                 crossOverFunction.makeWeighted();
                 crossOverFunction.makeGreedy(3, fitnessFunction);
-                EnsembleMutation mutationFunction = new EnsembleMutation(fitnessFunction);
-                MutationFunction mutationFunction1 = new RandomPixelAdjustmentsMutation(3, 1.0, 0.1);
-                MutationFunction mutationFunction2 = new SmoothMutation(1.0, true, fitnessFunction);
+                EnsembleMutation mutationFunction = new EnsembleMutation(1.0);
+                MutationFunction mutationFunction1 = new RandomPixelAdjustmentsMutation(1.0, 0.1, 3);
+                MutationFunction mutationFunction2 = new SmoothMutation(1.0);
                 MutationFunction mutationFunction3 = new RandomPixelsMutation(1.0, 0.1);
-                //MutationFunction mutationFunction = new RandomPixelsMutation(0.8, 0.1);
-                //MutationFunction mutationFunction = new PaintCanMutation();
                 mutationFunction1.makeGreedy(5, fitnessFunction);
+                mutationFunction1.makeNoHarm(fitnessFunction);
+                mutationFunction2.makeNoHarm(fitnessFunction);
+                mutationFunction3.makeGreedy(5, fitnessFunction);
+                mutationFunction3.makeNoHarm(fitnessFunction);
                 mutationFunction.addFunction(mutationFunction1, 1.0);
                 mutationFunction.addFunction(mutationFunction2, 1.0);
-
+                mutationFunction.makeNoHarm(fitnessFunction);
                 GeneticAlgorithm ga = new GeneticAlgorithm(
                         height,
                         width,

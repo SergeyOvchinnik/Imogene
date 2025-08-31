@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 public class ImageUtils {
 
+    // TODO: parametrise these
     static double centerWeight = 0.2;
     static double edgeWeight = 0.1;
 

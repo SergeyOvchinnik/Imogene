@@ -6,28 +6,22 @@ import com.utils.BitMapImage;
 import com.utils.ImageUtils;
 import com.utils.Util;
 
+/**
+ * A simple mutation that just applies the smooth filter to the
+ * entire image. Can be useful as part of the ensemble mutation
+ * function as it reduces the noise on large textures by sacrificing
+ * some edge clarity.
+ */
+
 public class SmoothMutation extends MutationFunction{
 
-    private double mutationProbability;
-    private boolean doNoHarm;
-    private FitnessFunction fitnessFunction;
-
-    public SmoothMutation(double mutationProbability, boolean doNoHarm, FitnessFunction fitnessFunction) {
-        this.mutationProbability = mutationProbability;
-        this.doNoHarm = doNoHarm;
-        this.fitnessFunction = fitnessFunction;
+    // TODO: add parameters for the weights in the smooth mask
+    public SmoothMutation(double mutationProbability) {
+        super(mutationProbability);
     }
 
-    public IndividualImage mutate(IndividualImage image) {
-
-        if(Util.rng.nextDouble(1.0) > mutationProbability)
-            return image.copy();
-
+    protected IndividualImage mutationAttempt(IndividualImage image) {
         IndividualImage smoothed = new IndividualImage(ImageUtils.smoothFilter(image.getImage()));
-
-        if(doNoHarm)
-            if (fitnessFunction.fitness(smoothed) < fitnessFunction.fitness(image)) // Horrible implementation, rewrite
-                return image.copy();
         return smoothed;
     }
 }

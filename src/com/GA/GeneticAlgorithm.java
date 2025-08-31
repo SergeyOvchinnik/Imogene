@@ -1,6 +1,6 @@
 package com.GA;
 
-import com.GA.crossover.CrossOverFunction;
+import com.GA.crossover.CrossoverFunction;
 import com.GA.fitness.FitnessFunction;
 import com.GA.generation.GenerationFunction;
 import com.GA.mutation.MutationFunction;
@@ -16,7 +16,7 @@ public class GeneticAlgorithm {
     public GenerationFunction generationFunction;
     public FitnessFunction fitnessFunction;
     public SelectionFunction selectionFunction;
-    public CrossOverFunction crossOverFunction;
+    public CrossoverFunction crossOverFunction;
     public MutationFunction mutationFunction;
 
     public int width = 100;
@@ -44,7 +44,7 @@ public class GeneticAlgorithm {
             GenerationFunction generationFunction,
             FitnessFunction fitnessFunction,
             SelectionFunction selectionFunction,
-            CrossOverFunction crossOverFunction,
+            CrossoverFunction crossOverFunction,
             MutationFunction mutationFunction) {
 
         // Initialise parameters
