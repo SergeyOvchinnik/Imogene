@@ -2,6 +2,7 @@ package com.GA;
 
 import com.GA.crossover.CrossoverFunction;
 import com.GA.fitness.FitnessFunction;
+import com.GA.fitness.adjustment.FitnessAdjustment;
 import com.GA.generation.GenerationFunction;
 import com.GA.mutation.MutationFunction;
 import com.GA.selection.SelectionFunction;
@@ -18,12 +19,14 @@ public class GeneticAlgorithm {
     public SelectionFunction selectionFunction;
     public CrossoverFunction crossOverFunction;
     public MutationFunction mutationFunction;
+    public FitnessAdjustment fitnessAdjustment;
 
     public int width = 100;
     public int height = 100;
 
     public int populationSize = 1000;
     public int elite = 30;
+    int additionalEDA = 50;
     public int regeneration = 100;
     public int generations = 10000;
     public IndividualImage[] population;
@@ -40,12 +43,14 @@ public class GeneticAlgorithm {
             int populationSize,
             int generations,
             int elite,
+            int additionalEDA,
             int regeneration,
             GenerationFunction generationFunction,
             FitnessFunction fitnessFunction,
             SelectionFunction selectionFunction,
             CrossoverFunction crossOverFunction,
-            MutationFunction mutationFunction) {
+            MutationFunction mutationFunction,
+            FitnessAdjustment fitnessAdjustment) {
 
         // Initialise parameters
         this.width = width;
@@ -53,12 +58,14 @@ public class GeneticAlgorithm {
         this.populationSize = populationSize;
         this.generations = generations;
         this.elite = elite;
+        this.additionalEDA = additionalEDA;
         this.regeneration = regeneration;
         this.generationFunction = generationFunction;
         this.fitnessFunction = fitnessFunction;
         this.selectionFunction = selectionFunction;
         this.crossOverFunction = crossOverFunction;
         this.mutationFunction = mutationFunction;
+        this.fitnessAdjustment = fitnessAdjustment;
 
         // Initialise population
         population = new IndividualImage[populationSize];
@@ -109,6 +116,8 @@ public class GeneticAlgorithm {
             newPopulation[i].assignFitness(fitnessFunction.fitness(newPopulation[i]));
         }
 
+        fitnessAdjustment.adjust(newPopulation);
+
         population = newPopulation;
 
         // Sort population by fitness
@@ -135,6 +144,7 @@ public class GeneticAlgorithm {
 
     }
 
+    // TODO: Old implementation, delete
     private IndividualImage sampleEDA() {
         int[][][] rgb = new int[height][width][3];
 
@@ -153,7 +163,7 @@ public class GeneticAlgorithm {
 
     // TODO: AI-generated method, untested
     private static int sampleAroundMean(double mean) {
-        double stdDev = 2.0; // tune this! larger = more spread, smaller = more concentrated
+        double stdDev = 3.0; // tune this! larger = more spread, smaller = more concentrated
         double value;
         do {
             // Box-Muller transform
@@ -189,12 +199,18 @@ public class GeneticAlgorithm {
         }
 
         // Use selection, crossover and mutation to create the next generation
-        for(int i = elite; i < populationSize - regeneration; i++) {
+        for(int i = elite; i < populationSize - (regeneration + additionalEDA); i++) {
             IndividualImage[] parents = selectionFunction.select(population);
             IndividualImage parent1 = parents[0];
             IndividualImage parent2 = parents[1];
             nextPopulation[i] = crossOverFunction.crossover(parent1, parent2);
             nextPopulation[i] = mutationFunction.mutate(nextPopulation[i]);
+        }
+
+        // Use EDA approach to generate some individuals using averages of top 50% of the population
+        double[][][] edaArray = generateEdaArray((int) Math.round(populationSize * 0.5)); // TODO: 0.5 as a ratio of top individuals used should be parametrised here
+        for(int i = populationSize - additionalEDA - regeneration; i < populationSize - regeneration; i++) {
+            nextPopulation[i] = sampleEDA(edaArray);
         }
 
         // Re-generate some individuals
@@ -218,6 +234,46 @@ public class GeneticAlgorithm {
         double meanFitness =  totalFitness / populationSize;
         System.out.println("Mean Fitness = " + meanFitness);
 
+    }
+
+    public double[][][] generateEdaArray(int numberOfIndividuals) {
+        double[][][] averageRGB = new double[height][width][3];
+        for(int i = 0; i < numberOfIndividuals; i++) {
+            int[][][] rgb = population[i].getImage().getRgb();
+            for(int y = 0; y < height; y++) {
+                for(int x = 0; x < width; x++) {
+                    for(int c = 0; c < 3; c++) {
+                        averageRGB[y][x][c] += rgb[y][x][c];
+                    }
+                }
+            }
+        }
+
+        for(int y = 0; y < height; y++) {
+            for(int x = 0; x < width; x++) {
+                for(int c = 0; c < 3; c++) {
+                    averageRGB[y][x][c] /= 0.0 + numberOfIndividuals;
+                }
+            }
+        }
+
+        return averageRGB;
+    }
+
+    private IndividualImage sampleEDA(double[][][] edaArray) {
+        int[][][] rgb = new int[height][width][3];
+
+        for(int y = 0; y < height; y++) {
+            for(int x = 0; x < width; x++) {
+                for(int c = 0; c < 3; c++) {
+                    rgb[y][x][c] = sampleAroundMean(edaArray[y][x][c]);
+                }
+            }
+        }
+
+        IndividualImage image = new IndividualImage(new BitMapImage(rgb));
+
+        return image;
     }
 
 }

@@ -9,7 +9,7 @@ public class ImageGenerator {
     private static Random rng = new Random(System.currentTimeMillis());
 
     public static BitMapImage randomPixels(int height, int width) {
-        int[][][] rgb = new int[width][height][3];
+        int[][][] rgb = new int[height][width][3];
         for(int y = 0; y < height; y++) {
             for(int x = 0; x < width; x++) {
                 rgb[y][x][0] = rng.nextInt(0, 256);

@@ -5,7 +5,7 @@ import com.GA.IndividualImage;
 public class SmoothnessFitness extends FitnessFunction {
 
     @Override
-    public double fitness(IndividualImage image) {
+    protected double fitnessCalculation(IndividualImage image) {
         int[][][] rgb = image.getImage().getRgb();
         double fitness = 0;
         for(int y = 0; y < rgb.length - 1; y++) {
@@ -25,5 +25,15 @@ public class SmoothnessFitness extends FitnessFunction {
         }
 
         return fitness;
+    }
+
+    /**
+     * Theoretical maximum fitness is achieved when the whole image is the same colour
+     *
+     * @param height Height of the image
+     * @param width Width of the image
+     */
+    protected void calculateMaxFitness(int height, int width) {
+        this.theoreticalMaximumFitness = 3.0 * 255.0 * (height * (width - 1) + (height - 1) * width);
     }
 }

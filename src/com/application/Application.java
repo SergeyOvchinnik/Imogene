@@ -1,15 +1,19 @@
 package com.application;
 
+import com.GA.crossover.BlendCrossover;
 import com.GA.crossover.PixelwiseCrossover;
 import com.GA.crossover.CrossoverFunction;
 import com.GA.fitness.*;
 import com.GA.GeneticAlgorithm;
 import com.GA.ImageGenerator;
+import com.GA.fitness.adjustment.FitnessAdjustment;
+import com.GA.fitness.adjustment.NormalisationAdjustment;
 import com.GA.generation.GenerationFunction;
 import com.GA.generation.RandomBitmapGeneration;
 import com.GA.mutation.*;
 import com.GA.selection.RouletteWheelSelection;
 import com.GA.selection.SelectionFunction;
+import com.GA.selection.TournamentSelection;
 import com.utils.BitMapImage;
 import com.utils.ImageRW;
 
@@ -45,7 +49,7 @@ public class Application {
     public static final boolean UPSCALE = true;
     public static final int UPSCALE_FACTOR = 5;
 
-    public static int currentImageWidth = 100;
+    public static int currentImageWidth = 133;
     public static int currentImageHeight = 100;
 
     public static BitMapImage currentImage;
@@ -114,7 +118,7 @@ public class Application {
         JPanel imageScreen = new JPanel();
         imageScreen.setLayout(new BoxLayout(imageScreen, BoxLayout.X_AXIS));
 
-        drawingPanel = new DrawingPanel(currentImageWidth, currentImageHeight);
+        drawingPanel = new DrawingPanel(currentImageHeight, currentImageWidth);
 
 
         JButton btnRandom = new JButton("Generate random");
@@ -134,25 +138,34 @@ public class Application {
                 int height = currentImageHeight;
                 int width = currentImageWidth;
                 int populationSize = 1000;
-                int generations = 1000;
-                int elite = 5;
+                int generations = 10000;
+                int elite = 20;
+                int additionalEDA = 0;
                 int regeneration = 30;
                 GenerationFunction generationFunction = new RandomBitmapGeneration();
                 //GenerationFunction generationFunction = new RandomColorGeneration();
                 FitnessFunction fitnessFunction1 = new CheckerboardFitness();
                 try {
-                    fitnessFunction1 = new ImageLikenessFitness(ImageRW.readImage("cat1.png"), height, width);
+                    fitnessFunction1 = new ImageLikenessFitness(ImageRW.readImage("benchmarkingImages/cans1.png"), height, width, true);
                 }
                 catch(Exception exception) {
                     exception.printStackTrace();
                     System.exit(0);
                 }
-                FitnessFunction fitnessFunction2 = new SmoothnessFitness();
+                FitnessFunction fitnessFunction2 = new CheckerboardFitness();
+                try {
+                    fitnessFunction2 = new ImageLikenessFitness(ImageRW.readImage("benchmarkingImages/cans1.png"), height, width, false);
+                }
+                catch(Exception exception) {
+                    exception.printStackTrace();
+                    System.exit(0);
+                }
                 EnsembleFitnessFunction fitnessFunction = new EnsembleFitnessFunction();
-                fitnessFunction.addFunction(fitnessFunction1, 1.0);
-                fitnessFunction.addFunction(fitnessFunction2, 0.1);
+                fitnessFunction.addFunction(fitnessFunction1, 0.5);
+                fitnessFunction.addFunction(fitnessFunction2, 0.5);
+                fitnessFunction.makeNormalised(currentImageHeight, currentImageWidth);
 
-                SelectionFunction selectionFunction = new RouletteWheelSelection();
+                SelectionFunction selectionFunction = new TournamentSelection(5, 0.5);
                 selectionFunction.makeRanked();
                 CrossoverFunction crossOverFunction = new PixelwiseCrossover();
                 crossOverFunction.makeWeighted();
@@ -169,18 +182,22 @@ public class Application {
                 mutationFunction.addFunction(mutationFunction1, 1.0);
                 mutationFunction.addFunction(mutationFunction2, 1.0);
                 mutationFunction.makeNoHarm(fitnessFunction);
+                FitnessAdjustment fitnessAdjustment = new NormalisationAdjustment();
+
                 GeneticAlgorithm ga = new GeneticAlgorithm(
                         height,
                         width,
                         populationSize,
                         generations,
                         elite,
+                        additionalEDA,
                         regeneration,
                         generationFunction,
                         fitnessFunction,
                         selectionFunction,
                         crossOverFunction,
-                        mutationFunction
+                        mutationFunction,
+                        fitnessAdjustment
                 );
 
                 new Thread(() -> {

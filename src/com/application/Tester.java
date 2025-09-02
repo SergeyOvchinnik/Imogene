@@ -13,9 +13,9 @@ public class Tester {
 
         BitMapImage image = null;
         try {
-            image = ImageRW.readImage("testy1.png");
-            image = ImageUtils.smoothFilter(image);
-            ImageRW.writeImage(image, "png", "testy1Smooth.png");
+            image = ImageRW.readImage("benchmarkingImages/cans1.png");
+            image = ImageUtils.resize(image, 100, 133);
+            ImageRW.writeImage(image, "png", "cansSmall.png");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
