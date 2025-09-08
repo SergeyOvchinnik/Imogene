@@ -122,6 +122,8 @@ public class ImageUtils {
             for(int x = 0; x < image.getWidth(); x++) {
                 for(int c = 0; c < 3; c++) {
                     adjusted[y][x][c] = (int) Math.round(rgb[y][x][c] * rgbWeights[c]);
+                    if(adjusted[y][x][c] < 0) adjusted[y][x][c] = 0;
+                    if(adjusted[y][x][c] > 255) adjusted[y][x][c] = 255;
                 }
             }
         }

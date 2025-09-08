@@ -52,7 +52,7 @@ public class EnsembleMutation extends MutationFunction {
 
     /**
      * Selects a random mutation function from the list, with probability of
-     * each function being selected  proportional to its weight and applies it.
+     * each function being selected proportional to its weight and applies it.
      *
      * @param individualImage The image to be mutated
      * @return A mutated image

@@ -28,7 +28,6 @@ public class GeneticAlgorithm {
     public int elite = 30;
     int additionalEDA = 50;
     public int regeneration = 100;
-    public int generations = 10000;
     public IndividualImage[] population;
     public boolean finished = false;
 
@@ -41,7 +40,6 @@ public class GeneticAlgorithm {
             int height,
             int width,
             int populationSize,
-            int generations,
             int elite,
             int additionalEDA,
             int regeneration,
@@ -56,7 +54,6 @@ public class GeneticAlgorithm {
         this.width = width;
         this.height = height;
         this.populationSize = populationSize;
-        this.generations = generations;
         this.elite = elite;
         this.additionalEDA = additionalEDA;
         this.regeneration = regeneration;

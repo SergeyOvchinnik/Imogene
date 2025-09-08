@@ -32,9 +32,9 @@ public class NormalisationAdjustment extends FitnessAdjustment {
         }
 
         // Divide all fitnesses by (max - min + 1) to project them onto (0; 1] range
-        double denominator = maxFitness - minFitness + 1;
+        double denominator = maxFitness - minFitness + 1; // TODO: 1 here creates an issue if the fitness function is normalised
         for(IndividualImage image: population) {
-            image.assignFitness(image.getFitness()/ denominator);
+            image.assignFitness(image.getFitness() / denominator);
         }
     }
 }

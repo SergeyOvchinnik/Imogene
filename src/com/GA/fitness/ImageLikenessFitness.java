@@ -19,7 +19,7 @@ public class ImageLikenessFitness extends FitnessFunction {
     // Max possible euclidean distance that each pixel can have from the target colour
     private double[][] maxEuclideanDiffs;
 
-    public ImageLikenessFitness(BitMapImage targetImage, int height,  int width, boolean euclidean) {
+    public ImageLikenessFitness(BitMapImage targetImage, int height, int width, boolean euclidean) {
         this.targetImage = ImageUtils.resize(targetImage, height, width);
         this.euclidean = euclidean;
 

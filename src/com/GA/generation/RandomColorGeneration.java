@@ -10,7 +10,7 @@ import com.utils.Util;
  */
 public class RandomColorGeneration extends GenerationFunction {
 
-    public IndividualImage generate(int width, int height) {
+    public IndividualImage generate(int height, int width) {
         int[][][] rgb = new int[height][width][3];
         int r = Util.rng.nextInt(256);
         int g = Util.rng.nextInt(256);

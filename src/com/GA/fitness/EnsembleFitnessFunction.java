@@ -12,6 +12,8 @@ public class EnsembleFitnessFunction extends FitnessFunction {
     public void addFunction(FitnessFunction fitnessFunction, double weight) {
         functions.add(fitnessFunction);
         weights.add(weight);
+//        if(normalised)
+//            fitnessFunction.makeNormalised(); // TODO: figure out this height/width inconsistency and fix this
     }
 
     @Override
@@ -34,8 +36,8 @@ public class EnsembleFitnessFunction extends FitnessFunction {
         for(int i = 0; i < functions.size(); i++) {
             functions.get(i).makeNormalised(height, width);
         }
-        calculateMaxFitness(height, width);
         normalised = true;
+        calculateMaxFitness(height, width);
     }
 
     /**
@@ -47,9 +49,17 @@ public class EnsembleFitnessFunction extends FitnessFunction {
      */
     protected void calculateMaxFitness(int height, int width) {
         double maxFitness = 0.0;
-        for(int i = 0; i < functions.size(); i++) {
-            maxFitness += functions.get(i).theoreticalMaximumFitness * weights.get(i);
+        if(normalised) {
+            for(int i = 0; i < functions.size(); i++) {
+                maxFitness += functions.get(i).theoreticalMaximumFitness * weights.get(i);
+            }
         }
+        else {
+            for(int i = 0; i < functions.size(); i++) {
+                maxFitness += weights.get(i);
+            }
+        }
+
         this.theoreticalMaximumFitness = maxFitness;
     }
 }
