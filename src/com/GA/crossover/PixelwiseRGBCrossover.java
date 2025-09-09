@@ -15,7 +15,7 @@ import com.utils.Util;
  *
  */
 
-public class PixelwiseCrossover extends CrossoverFunction {
+public class PixelwiseRGBCrossover extends CrossoverFunction {
 
     protected IndividualImage crossoverAttempt(IndividualImage image1, IndividualImage image2) {
         return weightedCrossoverAttempt(image1, image2, 0.5, 0.5);

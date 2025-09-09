@@ -4,25 +4,25 @@ import com.GA.IndividualImage;
 import com.utils.BitMapImage;
 import com.utils.ImageUtils;
 
-public class ValueLikenessFitness extends FitnessFunction {
+public class LightnessLikenessFitness extends FitnessFunction {
 
     // Maximum possible value distances that each pixel can have from the target colour
-    private int[][] vDiffs;
+    private double[][] lDiffs;
 
-    private int[][] imageValues;
+    private double[][] imageLightnesses;
 
-    public ValueLikenessFitness(BitMapImage targetImage, int height, int width) {
+    public LightnessLikenessFitness(BitMapImage targetImage, int height, int width) {
         BitMapImage image = ImageUtils.resize(targetImage, height, width);
 
         int[][][] rgb = image.getRgb();
-        vDiffs = new int[height][width];
-        imageValues = new int[height][width];
+        lDiffs = new double[height][width];
+        imageLightnesses = new double[height][width];
 
         for(int y = 0; y < height; y++) {
             for(int x = 0; x < width; x++) {
-                int pixelValue = Math.max(rgb[y][x][0], Math.max(rgb[y][x][1], rgb[y][x][2]));
-                imageValues[y][x] = pixelValue;
-                vDiffs[y][x] = Math.max(pixelValue, 255 - pixelValue);
+                double pixelLightness = ImageUtils.lightness(rgb[y][x][0], rgb[y][x][1], rgb[y][x][2]);
+                imageLightnesses[y][x] = pixelLightness;
+                lDiffs[y][x] = Math.max(pixelLightness, 255.0 - pixelLightness);
             }
         }
     }
@@ -33,9 +33,8 @@ public class ValueLikenessFitness extends FitnessFunction {
         int[][][] rgbImage = image.getImage().getRgb();
         for(int y = 0; y < rgbImage.length; y++) {
             for(int x = 0; x < rgbImage[0].length; x++) {
-                int pixelValue = Math.max(rgbImage[y][x][0], Math.max(rgbImage[y][x][1], rgbImage[y][x][2]));
-                fitness += vDiffs[y][x] - Math.abs(imageValues[y][x] - pixelValue);
-                //fitness += 255 - Math.abs(imageValues[y][x] - pixelValue); // TODO: experimental, revert to original later
+                double pixelValue = ImageUtils.lightness(rgbImage[y][x][0], rgbImage[y][x][1], rgbImage[y][x][2]);
+                fitness += lDiffs[y][x] - Math.abs(imageLightnesses[y][x] - pixelValue);
             }
         }
         return fitness;
@@ -46,7 +45,7 @@ public class ValueLikenessFitness extends FitnessFunction {
         double maxFitness = 0;
         for(int y = 0; y < height; y++) {
             for(int x = 0; x < width; x++) {
-                maxFitness += vDiffs[y][x];
+                maxFitness += lDiffs[y][x];
             }
         }
         this.theoreticalMaximumFitness = maxFitness;

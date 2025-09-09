@@ -5,6 +5,100 @@ import java.util.Arrays;
 
 public class ImageUtils {
 
+    public static double meanHue(double hue1, double hue2) {
+        double mean = (hue1 + hue2) / 2.0;
+        double opposite = (mean + 180.0) % 360.0;
+        double diff1 = mean - Math.min(hue1, hue2);
+        double diff2;
+        if(opposite > 0)
+            diff2 = Math.min(hue1, hue2) - opposite;
+        else
+            diff2 = opposite - Math.max(hue1, hue2);
+        if(diff1 < diff2)
+            return mean;
+        else
+            return opposite;
+    }
+
+    public static int[] rgbFromHSL(double hue, double saturation, double lightness) {
+        double chroma = (1 - Math.abs(2.0 * lightness - 1.0)) * saturation;
+        double hPrime = hue / 60.0;
+        double x = chroma * (1.0 - Math.abs((hPrime % 2.0) - 1.0));
+        double r1, g1, b1;
+        if(hPrime < 1.0) {
+            r1 = chroma;
+            g1 = x;
+            b1 = 0.0;
+        }
+        else if(hPrime < 2.0) {
+            r1 = x;
+            g1 = chroma;
+            b1 = 0.0;
+        }
+        else if(hPrime < 3.0) {
+            r1 = 0.0;
+            g1 = chroma;
+            b1 = x;
+        }
+        else if(hPrime < 4.0) {
+            r1 = 0.0;
+            g1 = x;
+            b1 = chroma;
+        }
+        else if(hPrime < 5.0) {
+            r1 = x;
+            g1 = 0.0;
+            b1 = chroma;
+        }
+        else {
+            r1 = chroma;
+            g1 = 0;
+            b1 = x;
+        }
+        double m = lightness - chroma / 2.0;
+        int r = (int) Math.round(r1 + m);
+        int g = (int) Math.round(g1 + m);
+        int b = (int) Math.round(b1 + m);
+        return new int[] {r, g, b};
+    }
+
+    public static double lightness(int r, int g, int b) {
+        int max = Math.max(r, Math.max(g, b));
+        int min = Math.min(r, Math.min(g, b));
+        double lightness = (0.0 + max + min) / 2.0;
+        return lightness;
+    }
+
+    public static double saturation(int r, int g, int b) {
+        int max = Math.max(r, Math.max(g, b));
+        int min = Math.min(r, Math.min(g, b));
+        double lightness = (0.0 + max + min) / 2.0;
+        int delta = max - min;
+        if(delta == 0)
+            return 0.0;
+        return delta / (1.0 - Math.abs(2.0 * lightness - 1.0));
+    }
+
+    public static double hue(int r, int g, int b) {
+        int max = Math.max(r, Math.max(g, b));
+        int min = Math.min(r, Math.min(g, b));
+        double lightness = (0.0 + max + min) / 2.0;
+        double delta = 0.0 + max - min;
+        if(delta == 0)
+            return 0.0;
+        double hue;
+        if(max == r)
+            hue = ((0.0 + g - b) / delta) % 6.0;
+        else if(max == g)
+            hue = ((0.0 + b - r) / delta) + 2.0;
+        else
+            hue = ((0.0 + r - g) / delta) + 4.0;
+        hue = Math.round(hue * 60.0);
+        if(hue < 0.0)
+            hue += 360.0;
+        return hue;
+    }
+
     // TODO: parametrise these
     static double centerWeight = 0.2;
     static double edgeWeight = 0.1;

@@ -20,11 +20,7 @@ public class SaturationLikenessFitness extends FitnessFunction {
 
         for(int y = 0; y < height; y++) {
             for(int x = 0; x < width; x++) {
-                int pixelValue = Math.max(rgb[y][x][0], Math.max(rgb[y][x][1], rgb[y][x][2]));
-                int pixelChroma = pixelValue - Math.min(rgb[y][x][0], Math.min(rgb[y][x][1], rgb[y][x][2]));
-                double pixelSaturation = 0.0;
-                if(pixelValue > 0)
-                    pixelSaturation = (0.0 + pixelChroma) / (0.0 + pixelValue);
+                double pixelSaturation = ImageUtils.saturation(rgb[y][x][0], rgb[y][x][1], rgb[y][x][2]);
                 imageSaturations[y][x] = pixelSaturation;
                 sDiffs[y][x] = Math.max(pixelSaturation, 1.0 - pixelSaturation);
             }
@@ -37,11 +33,7 @@ public class SaturationLikenessFitness extends FitnessFunction {
         int[][][] rgbImage = image.getImage().getRgb();
         for(int y = 0; y < rgbImage.length; y++) {
             for(int x = 0; x < rgbImage[0].length; x++) {
-                int pixelValue = Math.max(rgbImage[y][x][0], Math.max(rgbImage[y][x][1], rgbImage[y][x][2]));
-                int pixelChroma = pixelValue - Math.min(rgbImage[y][x][0], Math.min(rgbImage[y][x][1], rgbImage[y][x][2]));
-                double pixelSaturation = 0.0;
-                if(pixelValue > 0)
-                    pixelSaturation = (0.0 + pixelChroma) / (0.0 + pixelValue);
+                double pixelSaturation = ImageUtils.saturation(rgbImage[y][x][0], rgbImage[y][x][1], rgbImage[y][x][2]);
                 fitness += sDiffs[y][x] - Math.abs(imageSaturations[y][x] - pixelSaturation);
             }
         }

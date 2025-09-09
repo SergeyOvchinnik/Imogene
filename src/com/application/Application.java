@@ -2,13 +2,12 @@ package com.application;
 
 import com.GA.crossover.BlendCrossover;
 import com.GA.crossover.EnsembleCrossoverFunction;
-import com.GA.crossover.PixelwiseCrossover;
+import com.GA.crossover.PixelwiseRGBCrossover;
 import com.GA.crossover.CrossoverFunction;
 import com.GA.fitness.*;
 import com.GA.GeneticAlgorithm;
 import com.GA.ImageGenerator;
 import com.GA.fitness.adjustment.FitnessAdjustment;
-import com.GA.fitness.adjustment.NoAdjustment;
 import com.GA.fitness.adjustment.NormalisationAdjustment;
 import com.GA.generation.GenerationFunction;
 import com.GA.generation.RandomBitmapGeneration;
@@ -16,7 +15,6 @@ import com.GA.generation.RandomColorGeneration;
 import com.GA.mutation.*;
 import com.GA.selection.RouletteWheelSelection;
 import com.GA.selection.SelectionFunction;
-import com.GA.selection.TournamentSelection;
 import com.utils.BitMapImage;
 import com.utils.ImageRW;
 import com.utils.ImageUtils;
@@ -25,7 +23,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.Random;
 
 
@@ -52,10 +49,10 @@ public class Application {
 
     // TODO: move elsewhere
     public static final boolean UPSCALE = true;
-    public static final int UPSCALE_FACTOR = 7;
+    public static final int UPSCALE_FACTOR = 6;
 
-    public static int currentImageHeight = 30;
-    public static int currentImageWidth = 30;
+    public static int currentImageHeight = 100;
+    public static int currentImageWidth = 133;
 
     private static BitMapImage currentImage;
     private static GeneticAlgorithm currentGA;
@@ -71,7 +68,7 @@ public class Application {
         // Create the main window frame
         frame = new JFrame("Imogene");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1200, 800);
+        frame.setSize(1500, 800);
         frame.setLocationRelativeTo(null);
 
         // Initialise card layout
@@ -278,9 +275,9 @@ public class Application {
         JLabel lblCrossoverFunction = new JLabel("Crossover Function");
         JLabel lblMutationFunction = new JLabel("Mutation Function");
 
-        JTextField txtPopulationSize = new JTextField();
-        JTextField txtElite = new JTextField();
-        JTextField txtReGeneration = new JTextField();
+        JTextField txtPopulationSize = new JTextField("1000");
+        JTextField txtElite = new JTextField("30");
+        JTextField txtReGeneration = new JTextField("50");
         JComboBox<String> cmbGenerationFunction = new JComboBox<String>(new String[] {"Random Pixels"});
         JComboBox<String> cmbFitnessFunction = new JComboBox<String>(new String[] {"Image Likeness"});
         JComboBox<String> cmbSelectionFunction = new JComboBox<String>(new String[] {"Roulette Wheel"});
@@ -301,46 +298,100 @@ public class Application {
                 String mutationFunctionOption = cmbMutationFunction.getSelectedItem().toString();
 
                 GenerationFunction generationFunction = new RandomBitmapGeneration();
-                if(generationFunctionOption.equals("Random Pixels")) {
-                    generationFunction = new RandomBitmapGeneration();
+
+                FitnessFunction fitnessFunction1 = new CheckerboardFitness();
+                FitnessFunction fitnessFunction2 = new CheckerboardFitness();
+                FitnessFunction fitnessFunction3 = new CheckerboardFitness();
+                FitnessFunction fitnessFunction4 = new CheckerboardFitness();
+                FitnessFunction fitnessFunction5 = new CheckerboardFitness();
+                String targetPath = "benchmarkingImages/cans1.png";
+                try {
+                    fitnessFunction1 = new HueLikenessFitness(ImageRW.readImage(targetPath), currentImageHeight, currentImageWidth);
+                    fitnessFunction2 = new SaturationLikenessFitness(ImageRW.readImage(targetPath), currentImageHeight, currentImageWidth);
+                    fitnessFunction3 = new LightnessLikenessFitness(ImageRW.readImage(targetPath), currentImageHeight, currentImageWidth);
+                    fitnessFunction4 = new ImageLikenessFitness(ImageRW.readImage(targetPath), currentImageHeight, currentImageWidth, true);
+                    fitnessFunction5 = new ImageLikenessFitness(ImageRW.readImage(targetPath), currentImageHeight, currentImageWidth, false);
+                } catch(Exception exception) {
+                    exception.printStackTrace();
+                    System.exit(0);
                 }
                 EnsembleFitnessFunction fitnessFunction = new EnsembleFitnessFunction();
-                if(fitnessFunctionOption.equals("Image Likeness")) {
-                    try {
-                        BitMapImage image = ImageRW.readImage("benchmarkingImages/cans1.png");
-                        FitnessFunction fitnessFunction1 = new ImageLikenessFitness(image, currentImageHeight, currentImageWidth, false);
-                        fitnessFunction1.makeNormalised(currentImageHeight, currentImageWidth);
-                        fitnessFunction.addFunction(fitnessFunction1, 1.5);
-                        FitnessFunction fitnessFunction2 = new ImageLikenessFitness(image, currentImageHeight, currentImageWidth, true);
-                        fitnessFunction2.makeNormalised(currentImageHeight, currentImageWidth);
-                        fitnessFunction.addFunction(fitnessFunction2, 1.5);
-                        FitnessFunction fitnessFunction3 = new ValueLikenessFitness(image, currentImageHeight, currentImageWidth);
-                        fitnessFunction3.makeNormalised(currentImageHeight, currentImageWidth);
-                        fitnessFunction.addFunction(fitnessFunction3, 1.0);
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                        System.exit(0);
-                    }
-                }
+                fitnessFunction.addFunction(fitnessFunction1, 1.0);
+                fitnessFunction.addFunction(fitnessFunction2, 1.0);
+                fitnessFunction.addFunction(fitnessFunction3, 1.0);
+                fitnessFunction.addFunction(fitnessFunction4, 1.5);
+                fitnessFunction.addFunction(fitnessFunction5, 1.5);
+                fitnessFunction.makeNormalised(currentImageHeight, currentImageWidth);
 
                 SelectionFunction selectionFunction = new RouletteWheelSelection();
+                selectionFunction.makeRanked();
 
-                CrossoverFunction crossoverFunction = new PixelwiseCrossover();
-                crossoverFunction.makeWeighted();
-                crossoverFunction.makeGreedy(3, fitnessFunction);
+                CrossoverFunction crossOverFunction1 = new PixelwiseRGBCrossover();
+                crossOverFunction1.makeWeighted();
+                crossOverFunction1.makeGreedy(3, fitnessFunction);
+                CrossoverFunction crossOverFunction2 = new BlendCrossover();
+                crossOverFunction2.makeWeighted();
+                EnsembleCrossoverFunction crossoverFunction = new EnsembleCrossoverFunction();
+                crossoverFunction.addFunction(crossOverFunction1, 1.0);
+                crossoverFunction.addFunction(crossOverFunction2, 0.01);
 
-                MutationFunction mutationFunction1 = new RandomPixelsMutation(1.0, 0.1);
-                mutationFunction1.makeGreedy(3, fitnessFunction);
+
+                EnsembleMutation mutationFunction = new EnsembleMutation(1.0);
+                MutationFunction mutationFunction1 = new RandomPixelAdjustmentsMutation(1.0, 0.1, 3);
+                MutationFunction mutationFunction2 = new SmoothMutation(1.0);
+                MutationFunction mutationFunction3 = new RandomPixelsMutation(1.0, 0.1);
+                mutationFunction1.makeGreedy(5, fitnessFunction);
                 mutationFunction1.makeNoHarm(fitnessFunction);
-                MutationFunction mutationFunction2 = new RandomPixelAdjustmentsMutation(1.0, 0.3,5);
-                mutationFunction2.makeGreedy(3, fitnessFunction);
                 mutationFunction2.makeNoHarm(fitnessFunction);
-                EnsembleMutation mutationFunction = new EnsembleMutation(0.5);
+                mutationFunction3.makeGreedy(5, fitnessFunction);
+                mutationFunction3.makeNoHarm(fitnessFunction);
                 mutationFunction.addFunction(mutationFunction1, 1.0);
                 mutationFunction.addFunction(mutationFunction2, 1.0);
+                mutationFunction.addFunction(mutationFunction3, 1.0);
                 mutationFunction.makeNoHarm(fitnessFunction);
-
                 FitnessAdjustment fitnessAdjustment = new NormalisationAdjustment();
+
+//                GenerationFunction generationFunction = new RandomBitmapGeneration();
+//                if(generationFunctionOption.equals("Random Pixels")) {
+//                    generationFunction = new RandomBitmapGeneration();
+//                }
+//                EnsembleFitnessFunction fitnessFunction = new EnsembleFitnessFunction();
+//                if(fitnessFunctionOption.equals("Image Likeness")) {
+//                    try {
+//                        BitMapImage image = ImageRW.readImage("benchmarkingImages/cans1.png");
+//                        FitnessFunction fitnessFunction1 = new ImageLikenessFitness(image, currentImageHeight, currentImageWidth, false);
+//                        fitnessFunction1.makeNormalised(currentImageHeight, currentImageWidth);
+//                        fitnessFunction.addFunction(fitnessFunction1, 1.5);
+//                        FitnessFunction fitnessFunction2 = new ImageLikenessFitness(image, currentImageHeight, currentImageWidth, true);
+//                        fitnessFunction2.makeNormalised(currentImageHeight, currentImageWidth);
+//                        fitnessFunction.addFunction(fitnessFunction2, 1.5);
+//                        FitnessFunction fitnessFunction3 = new ValueLikenessFitness(image, currentImageHeight, currentImageWidth);
+//                        fitnessFunction3.makeNormalised(currentImageHeight, currentImageWidth);
+//                        fitnessFunction.addFunction(fitnessFunction3, 1.0);
+//                    } catch (IOException ex) {
+//                        ex.printStackTrace();
+//                        System.exit(0);
+//                    }
+//                }
+//
+//                SelectionFunction selectionFunction = new RouletteWheelSelection();
+//
+//                CrossoverFunction crossoverFunction = new PixelwiseCrossover();
+//                crossoverFunction.makeWeighted();
+//                crossoverFunction.makeGreedy(3, fitnessFunction);
+//
+//                MutationFunction mutationFunction1 = new RandomPixelsMutation(1.0, 0.1);
+//                mutationFunction1.makeGreedy(3, fitnessFunction);
+//                mutationFunction1.makeNoHarm(fitnessFunction);
+//                MutationFunction mutationFunction2 = new RandomPixelAdjustmentsMutation(1.0, 0.3,5);
+//                mutationFunction2.makeGreedy(3, fitnessFunction);
+//                mutationFunction2.makeNoHarm(fitnessFunction);
+//                EnsembleMutation mutationFunction = new EnsembleMutation(0.5);
+//                mutationFunction.addFunction(mutationFunction1, 1.0);
+//                mutationFunction.addFunction(mutationFunction2, 1.0);
+//                mutationFunction.makeNoHarm(fitnessFunction);
+//
+//                FitnessAdjustment fitnessAdjustment = new NormalisationAdjustment();
 
                 currentGA = new GeneticAlgorithm(
                         currentImageHeight,
@@ -421,6 +472,7 @@ public class Application {
         btnRun.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                btnRun.setEnabled(false);
                 int generations =  Integer.parseInt(txtGenerations.getText());
                 new Thread(() -> {
                     for(int i = 0; i < generations; i++) {
@@ -432,6 +484,7 @@ public class Application {
                         });
                         System.out.println("Thread painted");
                     }
+                    btnRun.setEnabled(true);
                     //ga.finished = true; // TODO: no longer needed
                 }).start();
             }
@@ -530,7 +583,7 @@ public class Application {
                 try {
                     fitnessFunction1 = new HueLikenessFitness(ImageRW.readImage(targetPath), height, width);
                     fitnessFunction2 = new SaturationLikenessFitness(ImageRW.readImage(targetPath), height, width);
-                    fitnessFunction3 = new ValueLikenessFitness(ImageRW.readImage(targetPath), height, width);
+                    fitnessFunction3 = new LightnessLikenessFitness(ImageRW.readImage(targetPath), height, width);
                     fitnessFunction4 = new ImageLikenessFitness(ImageRW.readImage(targetPath), height, width, true);
                     fitnessFunction5 = new ImageLikenessFitness(ImageRW.readImage(targetPath), height, width, false);
                 } catch(Exception exception) {
@@ -548,7 +601,7 @@ public class Application {
                 SelectionFunction selectionFunction = new RouletteWheelSelection();
                 selectionFunction.makeRanked();
 
-                CrossoverFunction crossOverFunction1 = new PixelwiseCrossover();
+                CrossoverFunction crossOverFunction1 = new PixelwiseRGBCrossover();
                 crossOverFunction1.makeWeighted();
                 crossOverFunction1.makeGreedy(3, fitnessFunction);
                 CrossoverFunction crossOverFunction2 = new BlendCrossover();
@@ -561,14 +614,14 @@ public class Application {
                 EnsembleMutation mutationFunction = new EnsembleMutation(1.0);
                 MutationFunction mutationFunction1 = new RandomPixelAdjustmentsMutation(1.0, 0.1, 3);
                 MutationFunction mutationFunction2 = new SmoothMutation(1.0);
-                MutationFunction mutationFunction3 = new RandomPixelsMutation(1.0, 0.1);
+                MutationFunction mutationFunction3 = new RandomPixelsMutation(1.0, 0.05);
                 mutationFunction1.makeGreedy(5, fitnessFunction);
                 mutationFunction1.makeNoHarm(fitnessFunction);
                 mutationFunction2.makeNoHarm(fitnessFunction);
                 mutationFunction3.makeGreedy(5, fitnessFunction);
                 mutationFunction3.makeNoHarm(fitnessFunction);
                 mutationFunction.addFunction(mutationFunction1, 1.0);
-                mutationFunction.addFunction(mutationFunction2, 1.0);
+                mutationFunction.addFunction(mutationFunction2, 1.2);
                 mutationFunction.addFunction(mutationFunction3, 1.0);
                 mutationFunction.makeNoHarm(fitnessFunction);
                 FitnessAdjustment fitnessAdjustment = new NormalisationAdjustment();
