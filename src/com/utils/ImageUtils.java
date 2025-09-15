@@ -5,6 +5,200 @@ import java.util.Arrays;
 
 public class ImageUtils {
 
+    public static BitMapImage invert(BitMapImage image) {
+        int[][][] rgb = image.getRgb();
+        int[][][] rgbOut = new int[rgb.length][rgb[0].length][3];
+        for(int y = 0; y  < image.getHeight(); y++)
+            for(int x = 0; x < image.getWidth(); x++)
+                for(int c = 0; c < 3; c++)
+                    rgbOut[y][x][c] = 255 - rgb[y][x][c];
+        return new BitMapImage(rgbOut);
+    }
+
+    public static BitMapImage spectralProjection(BitMapImage image, String source, String target) {
+        System.out.println("Called with " + source + " and " + target);
+        int[][][] rgbSource = image.getRgb();
+        int[][][] rgbTarget = image.getRgb();
+
+        // TODO: find a better way to parametrise these
+        double[][] sourceMetrics = new double[image.getHeight()][image.getWidth()];
+        if(source.equalsIgnoreCase("Hue")) {
+            sourceMetrics = hue(rgbSource);
+        }
+        else if(source.equalsIgnoreCase("Saturation")) {
+            sourceMetrics = saturation(rgbSource);
+        }
+        else if(source.equalsIgnoreCase("Lightness")) {
+            sourceMetrics = lightness(rgbSource);
+        }
+        else if(source.equalsIgnoreCase("Red")) {
+            sourceMetrics = red(rgbSource);
+        }
+        else if(source.equalsIgnoreCase("Green")) {
+            sourceMetrics = green(rgbSource);
+        }
+        else if(source.equalsIgnoreCase("Blue")) {
+            sourceMetrics = blue(rgbSource);
+        }
+
+        if(target.equalsIgnoreCase("Hue")) {
+            rgbTarget = projectOntoHue(sourceMetrics);
+        }
+        else if(target.equalsIgnoreCase("Saturation")) {
+            rgbTarget = projectOntoSaturation(sourceMetrics);
+        }
+        else if(target.equalsIgnoreCase("Lightness")) {
+            rgbTarget = projectOntoLightness(sourceMetrics);
+        }
+        else if(target.equalsIgnoreCase("Red")) {
+            rgbTarget = projectOntoRed(sourceMetrics);
+        }
+        else if(target.equalsIgnoreCase("Green")) {
+            rgbTarget = projectOntoGreen(sourceMetrics);
+        }
+        else if(target.equalsIgnoreCase("Blue")) {
+            rgbTarget = projectOntoBlue(sourceMetrics);
+        }
+
+        return new BitMapImage(rgbTarget);
+    }
+
+    public static int[][][] projectOntoRed(double[][] values) {
+        return projectOntoColour(values, 255, 0, 0);
+    }
+
+    public static int[][][] projectOntoGreen(double[][] values) {
+        return projectOntoColour(values, 0, 255, 0);
+    }
+
+    public static int[][][] projectOntoBlue(double[][] values) {
+        return projectOntoColour(values, 0, 0, 255);
+    }
+
+    // TODO: make this one universal, provide an array of colours for the spectrum gradient
+    public static int[][][] projectOntoColour(double[][] values, double r, double g, double b) {
+        double max = max(values);
+        int[][][] rgb = new int[values.length][values[0].length][3];
+        for(int y = 0; y < values.length; y++) {
+            for(int x = 0; x < values[0].length; x++) {
+                rgb[y][x][0] = (int) Math.round(r * values[y][x] / max);
+                rgb[y][x][1] = (int) Math.round(g * values[y][x] / max);
+                rgb[y][x][2] = (int) Math.round(b * values[y][x] / max);
+            }
+        }
+        return rgb;
+    }
+
+    public static int[][][] projectOntoHue(double[][] values) {
+        double max = max(values);
+        System.out.println("Max = " + max);
+        int[][][] rgb = new int[values.length][values[0].length][3];
+        for(int y = 0; y < values.length; y++) {
+            for(int x = 0; x < values[0].length; x++) {
+                double proportion = values[y][x] / max;
+                rgb[y][x] = rgbFromHSL(360.0 * proportion, 1.0, 255.0 * 0.5 * proportion);
+            }
+        }
+        return rgb;
+    }
+
+    // TODO: currently projects onto red, make parametric
+    public static int[][][] projectOntoSaturation(double[][] values) {
+        double max = max(values);
+        System.out.println("Max = " + max);
+        int[][][] rgb = new int[values.length][values[0].length][3];
+        for(int y = 0; y < values.length; y++) {
+            for(int x = 0; x < values[0].length; x++) {
+                rgb[y][x] = rgbFromHSL(0, values[y][x] / max, 128);
+            }
+        }
+        return rgb;
+    }
+
+    public static int[][][] projectOntoLightness(double[][] values) {
+        double max = max(values);
+        System.out.println("Max = " + max);
+        int[][][] rgb = new int[values.length][values[0].length][3];
+        for(int y = 0; y < values.length; y++) {
+            for(int x = 0; x < values[0].length; x++) {
+                rgb[y][x][0] = (int) Math.round(255.0 * values[y][x] / max);
+                rgb[y][x][1] = (int) Math.round(255.0 * values[y][x] / max);
+                rgb[y][x][2] = (int) Math.round(255.0 * values[y][x] / max);
+            }
+        }
+        return rgb;
+    }
+
+    public static double[][] hue(int[][][] rgb) {
+        double[][] out = new double[rgb.length][rgb[0].length];
+        for(int y = 0; y < rgb.length; y++) {
+            for(int x = 0; x < rgb[0].length; x++) {
+                out[y][x] = hue(rgb[y][x][0], rgb[y][x][1], rgb[y][x][2]);
+            }
+        }
+        return out;
+    }
+
+    public static double[][] saturation(int[][][] rgb) {
+        double[][] out = new double[rgb.length][rgb[0].length];
+        for(int y = 0; y < rgb.length; y++) {
+            for(int x = 0; x < rgb[0].length; x++) {
+                out[y][x] = saturation(rgb[y][x][0], rgb[y][x][1], rgb[y][x][2]);
+            }
+        }
+        return out;
+    }
+
+    public static double[][] lightness(int[][][] rgb) {
+        double[][] out = new double[rgb.length][rgb[0].length];
+        for(int y = 0; y < rgb.length; y++) {
+            for(int x = 0; x < rgb[0].length; x++) {
+                out[y][x] = lightness(rgb[y][x][0], rgb[y][x][1], rgb[y][x][2]);
+            }
+        }
+        return out;
+    }
+
+    public static double[][] red(int[][][] rgb) {
+        double[][] out = new double[rgb.length][rgb[0].length];
+        for(int y = 0; y < rgb.length; y++) {
+            for(int x = 0; x < rgb[0].length; x++) {
+                out[y][x] = 0.0 + rgb[y][x][0];
+            }
+        }
+        return out;
+    }
+
+    public static double[][] green(int[][][] rgb) {
+        double[][] out = new double[rgb.length][rgb[0].length];
+        for(int y = 0; y < rgb.length; y++) {
+            for(int x = 0; x < rgb[0].length; x++) {
+                out[y][x] = 0.0 + rgb[y][x][1];
+            }
+        }
+        return out;
+    }
+
+    public static double[][] blue(int[][][] rgb) {
+        double[][] out = new double[rgb.length][rgb[0].length];
+        for(int y = 0; y < rgb.length; y++) {
+            for(int x = 0; x < rgb[0].length; x++) {
+                out[y][x] = 0.0 + rgb[y][x][2];
+            }
+        }
+        return out;
+    }
+
+    public static double max(double[][] arr) {
+        double max = Double.MIN_VALUE;
+        for(int y =  0; y < arr.length; y++) {
+            for(int x = 0; x < arr[0].length; x++) {
+                max = Math.max(max, arr[y][x]);
+            }
+        }
+        return max;
+    }
+
     public static double meanHue(double hue1, double hue2) {
         double mean = (hue1 + hue2) / 2.0;
         double opposite = (mean + 180.0) % 360.0;
@@ -70,10 +264,14 @@ public class ImageUtils {
     }
 
     public static double saturation(int r, int g, int b) {
-        int max = Math.max(r, Math.max(g, b));
-        int min = Math.min(r, Math.min(g, b));
-        double lightness = (0.0 + max + min) / 2.0;
-        int delta = max - min;
+        double rd = r / 255.0;
+        double gd = g / 255.0;
+        double bd = b / 255.0;
+        double max = Math.max(rd, Math.max(gd, bd));
+        double min = Math.min(rd, Math.min(gd, bd));
+        double lightness = (max + min) / 2.0;
+        //lightness = lightness / 255.0;
+        double delta = max - min;
         if(delta == 0)
             return 0.0;
         return delta / (1.0 - Math.abs(2.0 * lightness - 1.0));
@@ -104,6 +302,10 @@ public class ImageUtils {
     static double edgeWeight = 0.1;
 
     public static BitMapImage smoothFilter(BitMapImage image) {
+        return smoothFilter(image, 0.6, 0.05);
+    }
+
+    public static BitMapImage smoothFilter(BitMapImage image, double centerWeight, double edgeWeight) {
         int[][][] rgb = image.getRgb();
         int[][][] adjusted = new int[image.getHeight()][image.getWidth()][3];
         for(int y = 0; y < image.getHeight(); y++) {

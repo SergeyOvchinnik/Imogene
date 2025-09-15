@@ -22,15 +22,23 @@ public class Tester {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        FitnessFunction fitnessFunction1 = new ImageLikenessFitness(cans, cans.getHeight(), cans.getWidth(), false);
-        fitnessFunction1.makeNormalised(cans.getHeight(), cans.getWidth());
-        EnsembleFitnessFunction fitnessFunction = new EnsembleFitnessFunction();
-        fitnessFunction.addFunction(fitnessFunction1, 1.0);
-        double fitness = fitnessFunction.fitness(new IndividualImage(cans));
-        System.out.println(fitness);
-        double fitness2 = fitnessFunction.fitness(new IndividualImage(ImageGenerator.randomPixels(cans.getHeight(), cans.getWidth())));
-        System.out.println(fitness2);
-
+        int[][][] rgb = cans.getRgb();
+        int[][][] out = new int[cans.getHeight()][cans.getWidth()][3];
+        for(int y = 0; y < cans.getHeight(); y++) {
+            for(int x = 0; x < cans.getWidth(); x++) {
+                int saturation = (int) Math.round(255.0 * ImageUtils.saturation(rgb[y][x][0], rgb[y][x][1], rgb[y][x][2]));
+                out[y][x][0] = saturation;
+                out[y][x][1] = saturation;
+                out[y][x][2] = saturation;
+                //System.out.println(saturation);
+            }
+        }
+        BitMapImage sat = new BitMapImage(out);
+        try {
+            ImageRW.writeImage(sat, "png", "sat.png");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
 
     }
