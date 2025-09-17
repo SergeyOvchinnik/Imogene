@@ -1,16 +1,19 @@
-package com.application;
+package com.application.panels;
+
+import com.application.Application;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-class DrawingPanel extends JPanel {
+public class DrawingPanel extends JPanel {
     private BufferedImage canvas;
 
     public DrawingPanel(int height, int width) {
-        if(Application.UPSCALE) {
-            width *= Application.UPSCALE_FACTOR;
-            height *= Application.UPSCALE_FACTOR;
+        setLayout(new GridBagLayout());
+        if(ImageScreen.UPSCALE) {
+            width *= ImageScreen.UPSCALE_FACTOR;
+            height *= ImageScreen.UPSCALE_FACTOR;
         }
         this.setSize(width, height);
         System.out.println(getWidth() + " by " + getHeight());
