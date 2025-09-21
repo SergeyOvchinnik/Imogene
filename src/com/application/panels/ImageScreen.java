@@ -60,7 +60,7 @@ public class ImageScreen extends JPanel {
 
         // Create splitPanes to separate the screen into three resizable panels
         JSplitPane splitLeftCenter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, drawingPanel);
-        splitLeftCenter .setResizeWeight(0.15);
+        splitLeftCenter .setResizeWeight(0.10);
         JSplitPane splitAll = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitLeftCenter, rightPanel);
         splitAll.setResizeWeight(0.85);
 
@@ -98,7 +98,7 @@ public class ImageScreen extends JPanel {
                 drawPixel(x, y, new Color(bitmap[y][x][0], bitmap[y][x][1], bitmap[y][x][2]));
             }
         }
-        System.out.println("Painted image");
+        //System.out.println("Painted image");
     }
 
 

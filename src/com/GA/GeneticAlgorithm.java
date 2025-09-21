@@ -10,6 +10,7 @@ import com.utils.BitMapImage;
 import com.utils.Util;
 
 import java.util.ArrayList;
+import java.util.function.Function;
 
 public class GeneticAlgorithm {
 
@@ -131,13 +132,13 @@ public class GeneticAlgorithm {
         // Store the best in population
         best.add(population[0]);
 
-        double totalFitness = 0.0;
-        for(int i = 0; i < populationSize; i++) {
-            totalFitness += population[i].getFitness();
-        }
-
-        double meanFitness =  totalFitness / populationSize;
-        System.out.println("Mean Fitness = " + meanFitness);
+//        double totalFitness = 0.0;
+//        for(int i = 0; i < populationSize; i++) {
+//            totalFitness += population[i].getFitness();
+//        }
+//
+//        double meanFitness =  totalFitness / populationSize;
+//        System.out.println("Mean Fitness = " + meanFitness);
 
     }
 
@@ -223,13 +224,13 @@ public class GeneticAlgorithm {
         // Update the population
         population = nextPopulation;
 
-        double totalFitness = 0.0;
-        for(int i = 0; i < populationSize; i++) {
-            totalFitness += population[i].getFitness();
-        }
-
-        double meanFitness =  totalFitness / populationSize;
-        System.out.println("Mean Fitness = " + meanFitness);
+//        double totalFitness = 0.0;
+//        for(int i = 0; i < populationSize; i++) {
+//            totalFitness += population[i].getFitness();
+//        }
+//
+//        double meanFitness =  totalFitness / populationSize;
+//        System.out.println("Mean Fitness = " + meanFitness);
 
     }
 
@@ -271,6 +272,14 @@ public class GeneticAlgorithm {
         IndividualImage image = new IndividualImage(new BitMapImage(rgb));
 
         return image;
+    }
+
+    // For use in manual adjustments between GA steps
+    public void applyToAll(Function<BitMapImage, BitMapImage> function) {
+        for(int i = 0; i < populationSize; i++) {
+            population[i] = new IndividualImage((BitMapImage) function.apply(population[i].getImage()));
+            population[i].assignFitness(fitnessFunction.fitness(population[i]));
+        }
     }
 
 }
