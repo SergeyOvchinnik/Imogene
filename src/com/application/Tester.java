@@ -20,14 +20,16 @@ public class Tester {
 
     public static void main(String[] args) {
 
-        UIDefaults defaults = UIManager.getDefaults();
-        Enumeration<Object> keysEnumeration = defaults.keys();
-        ArrayList<Object> keysList = Collections.list(keysEnumeration);
-        for (Object key : keysList)
-        {
-            if(key.toString().endsWith("font"))
-                System.out.println(key);
-        }
+        //System.out.println(Arrays.toString(ImageUtils.rgbFromHSL(0.0, )));
+
+//        UIDefaults defaults = UIManager.getDefaults();
+//        Enumeration<Object> keysEnumeration = defaults.keys();
+//        ArrayList<Object> keysList = Collections.list(keysEnumeration);
+//        for (Object key : keysList)
+//        {
+//            if(key.toString().endsWith("font"))
+//                System.out.println(key);
+//        }
 
 //        BitMapImage cans = new BitMapImage(new int[1][1][3]);
 //        try {

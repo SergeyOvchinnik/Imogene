@@ -41,6 +41,8 @@ public class ImageUtils {
             sourceMetrics = blue(rgbSource);
         }
 
+        System.out.println(Arrays.deepToString(sourceMetrics));
+
         if(target.equalsIgnoreCase("Hue")) {
             rgbTarget = projectOntoHue(sourceMetrics);
         }
@@ -96,7 +98,38 @@ public class ImageUtils {
         for(int y = 0; y < values.length; y++) {
             for(int x = 0; x < values[0].length; x++) {
                 double proportion = values[y][x] / max;
-                rgb[y][x] = rgbFromHSL(360.0 * proportion, 1.0, 255.0 * 0.5 * proportion);
+                if(proportion < 0.25) {
+                    int r = 255;
+                    int g = (int) Math.round(255 * proportion * 2.0);
+                    int b = 0;
+                    rgb[y][x][0] = r;
+                    rgb[y][x][1] = g;
+                    rgb[y][x][2] = b;
+                }
+                else if(proportion < 0.5) {
+                    int g = 255;
+                    int r = (int) Math.round(255 * (proportion - 0.25) * 2.0);
+                    int b = 0;
+                    rgb[y][x][0] = r;
+                    rgb[y][x][1] = g;
+                    rgb[y][x][2] = b;
+                }
+                else if(proportion < 0.75) {
+                    int g = 255;
+                    int b = (int) Math.round(255 * (proportion - 0.5) * 2.0);
+                    int r = 0;
+                    rgb[y][x][0] = r;
+                    rgb[y][x][1] = g;
+                    rgb[y][x][2] = b;
+                }
+                else {
+                    int b = 255;
+                    int g = (int) Math.round(255 * (proportion - 0.75) * 2.0);
+                    int r = 0;
+                    rgb[y][x][0] = r;
+                    rgb[y][x][1] = g;
+                    rgb[y][x][2] = b;
+                }
             }
         }
         return rgb;
@@ -109,7 +142,7 @@ public class ImageUtils {
         int[][][] rgb = new int[values.length][values[0].length][3];
         for(int y = 0; y < values.length; y++) {
             for(int x = 0; x < values[0].length; x++) {
-                rgb[y][x] = rgbFromHSL(0, values[y][x] / max, 128);
+                rgb[y][x] = rgbFromHSL(0, values[y][x] / max, 0.5);
             }
         }
         return rgb;
@@ -215,51 +248,95 @@ public class ImageUtils {
     }
 
     public static int[] rgbFromHSL(double hue, double saturation, double lightness) {
-        double chroma = (1 - Math.abs(2.0 * lightness - 1.0)) * saturation;
-        double hPrime = hue / 60.0;
-        double x = chroma * (1.0 - Math.abs((hPrime % 2.0) - 1.0));
-        double r1, g1, b1;
-        if(hPrime < 1.0) {
-            r1 = chroma;
-            g1 = x;
-            b1 = 0.0;
+        if(saturation == 0.0) {
+            int lightnessInt = (int) Math.round(lightness);
+            return new int[]{lightnessInt, lightnessInt, lightnessInt};
         }
-        else if(hPrime < 2.0) {
-            r1 = x;
-            g1 = chroma;
-            b1 = 0.0;
-        }
-        else if(hPrime < 3.0) {
-            r1 = 0.0;
-            g1 = chroma;
-            b1 = x;
-        }
-        else if(hPrime < 4.0) {
-            r1 = 0.0;
-            g1 = x;
-            b1 = chroma;
-        }
-        else if(hPrime < 5.0) {
-            r1 = x;
-            g1 = 0.0;
-            b1 = chroma;
+        double q = 0.0;
+        if(lightness < 0.5) {
+            q = lightness * (1.0 + saturation);
         }
         else {
-            r1 = chroma;
-            g1 = 0;
-            b1 = x;
+            q = lightness + saturation - lightness * saturation;
         }
-        double m = lightness - chroma / 2.0;
-        int r = (int) Math.round(r1 + m);
-        int g = (int) Math.round(g1 + m);
-        int b = (int) Math.round(b1 + m);
+        double p = 2.0 * lightness - q;
+        int r = (int) Math.floor(255.0 * hueToRgb(p, q, hue + 1.0 / 3.0));
+        int g = (int) Math.floor(255.0 * hueToRgb(p, q, hue));
+        int b = (int) Math.floor(255.0 * hueToRgb(p, q, hue - 1.0 / 3.0));
         return new int[] {r, g, b};
     }
 
+    private static double hueToRgb(double p, double q, double t) {
+        if(t < 0.0)
+            t += 1.0;
+        if(t > 1.0)
+            t -= 1.0;
+        if(t < 1.0 / 6.0)
+            return p + (q - p) * 6.0 * t;
+        if (t < 1.0 / 2.0)
+            return q;
+        if (t < 2.0 / 3.0)
+            return p + (q - p) * (2.0 / 3.0 - t) * 6.0;
+        return p;
+    }
+
+//    public static int[] rgbFromHSL(double hue, double saturation, double lightness) {
+//        double chroma = (1 - Math.abs(2.0 * lightness - 1.0)) * saturation;
+//        double hPrime = hue / 60.0;
+//        double x = chroma * (1.0 - Math.abs((hPrime % 2.0) - 1.0));
+//        double r1, g1, b1;
+//        if(hPrime < 1.0) {
+//            r1 = chroma;
+//            g1 = x;
+//            b1 = 0.0;
+//        }
+//        else if(hPrime < 2.0) {
+//            r1 = x;
+//            g1 = chroma;
+//            b1 = 0.0;
+//        }
+//        else if(hPrime < 3.0) {
+//            r1 = 0.0;
+//            g1 = chroma;
+//            b1 = x;
+//        }
+//        else if(hPrime < 4.0) {
+//            r1 = 0.0;
+//            g1 = x;
+//            b1 = chroma;
+//        }
+//        else if(hPrime < 5.0) {
+//            r1 = x;
+//            g1 = 0.0;
+//            b1 = chroma;
+//        }
+//        else {
+//            r1 = chroma;
+//            g1 = 0;
+//            b1 = x;
+//        }
+//        double m = lightness - chroma / 2.0;
+//        int r = (int) Math.round(r1 + m);
+//        int g = (int) Math.round(g1 + m);
+//        int b = (int) Math.round(b1 + m);
+//        return new int[] {r, g, b};
+//    }
+
+    /**
+     * Calculates the lightness of an rgb colour, scales from 0.0 to 1.0
+     *
+     * @param r
+     * @param g
+     * @param b
+     * @return Normalised lightness of the colour
+     */
     public static double lightness(int r, int g, int b) {
-        int max = Math.max(r, Math.max(g, b));
-        int min = Math.min(r, Math.min(g, b));
-        double lightness = (0.0 + max + min) / 2.0;
+        double rd = r / 255.0;
+        double gd = g / 255.0;
+        double bd = b / 255.0;
+        double max = Math.max(rd, Math.max(gd, bd));
+        double min = Math.min(rd, Math.min(gd, bd));
+        double lightness = (max + min) / 2.0;
         return lightness;
     }
 
@@ -294,7 +371,7 @@ public class ImageUtils {
         hue = Math.round(hue * 60.0);
         if(hue < 0.0)
             hue += 360.0;
-        return hue;
+        return hue / 360.0;
     }
 
     // TODO: parametrise these

@@ -24,7 +24,7 @@ public class GAGenerationsPanel extends JPanel {
         return instance;
     }
 
-    public GAGenerationsPanel() {
+    private GAGenerationsPanel() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         JLabel lblGenerations = new JLabel("Generations");
         JTextField txtGenerations = new JTextField();
