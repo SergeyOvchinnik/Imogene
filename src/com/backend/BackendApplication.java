@@ -11,21 +11,19 @@ import java.net.InetSocketAddress;
 public class BackendApplication {
 
     public static void main(String[] args) throws IOException {
-        // Create an HTTP server on port 8000
-        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+        int portNumber = 8080;
+        HttpServer server = HttpServer.create(new InetSocketAddress(portNumber), 0);
 
         // Set up a context (a route) and its handler
         server.createContext("/", new RootHandler());
-        server.createContext("/die", new DieHandler());
 
         // Start the server
         server.setExecutor(null); // creates a default executor
         server.start();
 
-        System.out.println("Server started on http://localhost:8080");
+        System.out.println("Server started on http://localhost:" + portNumber);
     }
 
-    // Handler for the root path
     static class RootHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
@@ -47,15 +45,14 @@ public class BackendApplication {
         }
     }
 
-    // Handler for /hello path
-    static class DieHandler implements HttpHandler {
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            String response = "Shutting down...";
-            exchange.sendResponseHeaders(200, response.getBytes().length);
-            System.out.println("Shutting down...");
-            System.exit(0);
-        }
-    }
+//    static class DieHandler implements HttpHandler {
+//        @Override
+//        public void handle(HttpExchange exchange) throws IOException {
+//            String response = "Shutting down...";
+//            exchange.sendResponseHeaders(200, response.getBytes().length);
+//            System.out.println("Shutting down...");
+//            System.exit(0);
+//        }
+//    }
 
 }
