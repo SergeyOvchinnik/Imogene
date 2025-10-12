@@ -1,5 +1,6 @@
 package com.application;
 
+import com.API.GenerationConnector;
 import com.GA.ImageGenerator;
 import com.GA.IndividualImage;
 import com.GA.fitness.EnsembleFitnessFunction;
@@ -19,6 +20,14 @@ import java.util.Enumeration;
 public class Tester {
 
     public static void main(String[] args) {
+
+//        try {
+//            GenerationConnector.requestGeneration();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
 
         //System.out.println(Arrays.toString(ImageUtils.rgbFromHSL(0.0, )));
 

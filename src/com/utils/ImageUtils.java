@@ -1,5 +1,6 @@
 package com.utils;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -846,5 +847,21 @@ public class ImageUtils {
         return bestArea;
     }
 
+    public static BufferedImage arrayToBufferedImage(int[][][] rgb) {
+        int height = rgb.length;
+        int width = rgb[0].length;
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int r = rgb[y][x][0];
+                int g = rgb[y][x][1];
+                int b = rgb[y][x][2];
+                int colour = (r << 16) | (g << 8) | b;
+                img.setRGB(x, y, colour);
+            }
+        }
+        return img;
+    }
 
 }

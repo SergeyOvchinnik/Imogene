@@ -270,6 +270,9 @@ public class LeftSidebar extends JPanel {
         btnLightnessOntoHue.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnLightnessOntoHue.getPreferredSize().height));
         btnCustom.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnCustom.getPreferredSize().height));
 
+
+
+
     }
 
 }

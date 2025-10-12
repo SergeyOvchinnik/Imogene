@@ -19,16 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
-
-/**
- * TODO:
- *
- * - Implement an image-to-image animation generation, e.g. upload two images, then run a GA that tries to optimise the likeness of the population to the combination of the first and second image, e.g. fitness is 100% of similarity to first image + 0% similarity to second. As the generation pass, the balance shifts towards the later image.
- *
- *
- */
-
-
 public class Application {
 
     public static Random rng = new Random();
