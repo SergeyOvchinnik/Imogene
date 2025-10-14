@@ -17,7 +17,7 @@ public class EnsembleCrossoverFunction extends CrossoverFunction {
     }
 
     /**
-     * Ads a new crossover function to the list of available functions
+     * Adds a new crossover function to the list of available functions
      *
      * @param function The new crossover function
      * @param weight The likelihood of the function being applied

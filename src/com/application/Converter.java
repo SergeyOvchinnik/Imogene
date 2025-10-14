@@ -5,6 +5,9 @@ import javax.imageio.stream.ImageOutputStream;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+/**
+ * Converter class, originally used for gif creation
+ */
 public class Converter {
     private javax.imageio.ImageWriter gifWriter;
     private javax.imageio.stream.ImageOutputStream imageOutputStream;

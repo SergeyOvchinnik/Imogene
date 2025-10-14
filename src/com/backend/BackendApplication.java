@@ -25,6 +25,7 @@ public class BackendApplication {
         int portNumber = 8080;
         HttpServer server = HttpServer.create(new InetSocketAddress(portNumber), 0);
 
+        // Assign handlers to endpoints
         server.createContext("/", new RootHandler());
         server.createContext("/generate", new GenerationHandler());
         server.createContext("/filter", new FilterHandler());

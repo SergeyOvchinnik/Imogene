@@ -37,6 +37,7 @@ public class ConnectionScreen extends JPanel {
 
         int spacing = 20;
 
+        // Copy-pasted from mode screen TODO: clean up
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 0, 5, spacing/2);
         gbc.gridx = 0;

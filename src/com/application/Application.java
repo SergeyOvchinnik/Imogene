@@ -34,6 +34,7 @@ public class Application {
 
     }
 
+    // TODO: move out of Application class
     public static void saveGAAsGIF() {
         try (ImageOutputStream output = new FileImageOutputStream(new File("out/" + System.currentTimeMillis() + ".gif"))) {
             Converter writer = new Converter(output,

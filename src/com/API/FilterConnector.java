@@ -1,19 +1,14 @@
 package com.API;
 
 import com.application.panels.ConnectionScreen;
-import com.application.panels.ImageScreen;
 import com.utils.BitMapImage;
 import com.utils.Util;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Scanner;
 
 public class FilterConnector {
 
@@ -26,7 +21,7 @@ public class FilterConnector {
 
         String imageJson = Util.arrayToJson(image.getRgb());
 
-        String jsonBody = String.format("{\"type\":\"grayscale\",\"image\":\"%s\"}", imageJson);
+        String jsonBody = String.format("{\"type\":\"" + type + "\",\"image\":\"%s\"}", imageJson);
 
         // Send request
         HttpClient client = HttpClient.newHttpClient();

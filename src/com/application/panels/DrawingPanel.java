@@ -1,7 +1,5 @@
 package com.application.panels;
 
-import com.application.Application;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -16,7 +14,6 @@ public class DrawingPanel extends JPanel {
             height *= ImageScreen.UPSCALE_FACTOR;
         }
         this.setSize(width, height);
-        //System.out.println(getWidth() + " by " + getHeight());
         canvas = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
         clearCanvas();
     }

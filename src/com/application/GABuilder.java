@@ -15,6 +15,9 @@ import com.GA.selection.RouletteWheelSelection;
 import com.GA.selection.SelectionFunction;
 import com.application.panels.ImageScreen;
 
+/**
+ * A relatively simple factory class for genetic algorithm objects
+ */
 public class GABuilder {
 
     private int imageHeight;

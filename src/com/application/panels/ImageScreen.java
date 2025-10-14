@@ -72,10 +72,8 @@ public class ImageScreen extends JPanel {
 
     public static void drawPixel(int x, int y, Color color) {
         if(ImageScreen.UPSCALE) {
-            //System.out.println("O: " + x + ", " + y);
             for(int xc = x*ImageScreen.UPSCALE_FACTOR; xc < x*ImageScreen.UPSCALE_FACTOR + ImageScreen.UPSCALE_FACTOR; xc++)
                 for(int yc = y*ImageScreen.UPSCALE_FACTOR; yc < y*ImageScreen.UPSCALE_FACTOR + ImageScreen.UPSCALE_FACTOR; yc++) {
-                    //System.out.println(xc + ", " + yc);
                     ImageScreen.drawingPanel.setPixel(xc, yc, color);
                 }
         }
@@ -88,17 +86,12 @@ public class ImageScreen extends JPanel {
     }
 
     private static void paintImage(BitMapImage image) {
-//        imageScreen.remove(drawingPanel);
-//        drawingPanel = new DrawingPanel(currentImageHeight, currentImageWidth);
-//        imageScreen.add(drawingPanel, BorderLayout.CENTER);
-//        imageScreen.setVisible(true);
         int[][][] bitmap = image.getRgb();
         for(int y = 0; y < ImageScreen.currentImageHeight; y++) {
             for(int x = 0; x < ImageScreen.currentImageWidth; x++) {
                 drawPixel(x, y, new Color(bitmap[y][x][0], bitmap[y][x][1], bitmap[y][x][2]));
             }
         }
-        //System.out.println("Painted image");
     }
 
 

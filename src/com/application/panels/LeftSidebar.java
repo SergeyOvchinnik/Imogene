@@ -4,15 +4,12 @@ import com.API.FilterConnector;
 import com.API.GenerationConnector;
 import com.GA.ImageGenerator;
 import com.GA.generation.RandomColorGeneration;
-import com.application.Application;
 import com.utils.ImageUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.util.Arrays;
 
 public class LeftSidebar extends JPanel {
 
