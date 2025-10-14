@@ -25,7 +25,8 @@ public class RightSidebar extends JPanel {
 
     // Card layout elements visible to other application panels
     protected static final CardLayout layout = new CardLayout();
-    //protected static final JPanel cards = new JPanel(layout);
+
+    private boolean remote = false;
 
     // Singleton pattern
     private static final RightSidebar instance = new RightSidebar();
@@ -56,6 +57,10 @@ public class RightSidebar extends JPanel {
 
         // Display the first card
         layout.show(this, "GA Init");
+
+    }
+
+    public void makeRemote() {
 
     }
 

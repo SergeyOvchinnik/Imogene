@@ -25,6 +25,13 @@ public class ModeScreen extends JPanel {
             }
         });
 
+        btnRemote.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ApplicationWindow.layout.show(ApplicationWindow.cards, "Connection");
+            }
+        });
+
         Dimension buttonSize = new Dimension(300, 80);
         btnLocal.setPreferredSize(buttonSize);
         btnRemote.setPreferredSize(buttonSize);

@@ -1,8 +1,6 @@
 package com.utils;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class Util {
 
@@ -60,31 +58,56 @@ public class Util {
     }
 
     public static int[][][] parse3DArray(String json) {
-        // Remove outer brackets
-        json = json.trim();
-        if (json.startsWith("[") && json.endsWith("]")) {
-            json = json.substring(1, json.length() - 1);
-        }
+        List<List<List<Integer>>> list3D = new ArrayList<>();
+        List<List<Integer>> currentRow = null;
+        List<Integer> currentPixel = null;
+        StringBuilder numBuffer = new StringBuilder();
 
-        // Split into rows
-        String[] rows = json.split("\\],\\["); // splits on "],["
-        int height = rows.length;
-        int width = rows[0].split("\\],\\[|\\],\\[").length; // approximate width
-        int[][][] array = new int[height][][];
+        for (char c : json.toCharArray()) {
+            if (Character.isDigit(c) || c == '-') {
+                numBuffer.append(c);
+            } else if (c == ',') {
+                if (numBuffer.length() > 0 && currentPixel != null) {
+                    currentPixel.add(Integer.parseInt(numBuffer.toString()));
+                    numBuffer.setLength(0);
+                }
+            } else if (c == '[') {
+                // new level
+                if (currentRow == null) {
+                    currentRow = new ArrayList<>();
+                } else if (currentPixel == null) {
+                    currentPixel = new ArrayList<>();
+                }
+            } else if (c == ']') {
+                if (numBuffer.length() > 0) {
+                    currentPixel.add(Integer.parseInt(numBuffer.toString()));
+                    numBuffer.setLength(0);
+                }
 
-        for (int y = 0; y < height; y++) {
-            String row = rows[y].replaceAll("\\[|\\]", ""); // remove brackets
-            String[] pixels = row.split("\\],\\[|\\],|,\\[|\\],"); // split pixels
-            int pixelCount = pixels.length / 3;
-            array[y] = new int[pixelCount][3];
-            for (int x = 0; x < pixelCount; x++) {
-                array[y][x][0] = Integer.parseInt(pixels[x * 3].trim());
-                array[y][x][1] = Integer.parseInt(pixels[x * 3 + 1].trim());
-                array[y][x][2] = Integer.parseInt(pixels[x * 3 + 2].trim());
+                if (currentPixel != null) {
+                    currentRow.add(currentPixel);
+                    currentPixel = null;
+                } else if (currentRow != null) {
+                    list3D.add(currentRow);
+                    currentRow = null;
+                }
             }
         }
 
-        return array;
+        // Convert to int[][][]
+        int[][][] result = new int[list3D.size()][][];
+        for (int y = 0; y < list3D.size(); y++) {
+            List<List<Integer>> row = list3D.get(y);
+            result[y] = new int[row.size()][3];
+            for (int x = 0; x < row.size(); x++) {
+                List<Integer> pixel = row.get(x);
+                for (int c = 0; c < 3 && c < pixel.size(); c++) {
+                    result[y][x][c] = pixel.get(c);
+                }
+            }
+        }
+
+        return result;
     }
 
 }

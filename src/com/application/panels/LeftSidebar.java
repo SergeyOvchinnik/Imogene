@@ -1,5 +1,6 @@
 package com.application.panels;
 
+import com.API.GenerationConnector;
 import com.GA.ImageGenerator;
 import com.GA.generation.RandomColorGeneration;
 import com.application.Application;
@@ -9,6 +10,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.Arrays;
 
 public class LeftSidebar extends JPanel {
 
@@ -19,25 +22,64 @@ public class LeftSidebar extends JPanel {
         return instance;
     }
 
+    private boolean remote = false;
+
+    // Buttons moved out for visibility customisation
+    private JButton generateRandom;
+    private JButton generateColour;
+    private JButton filterGrayscale;
+    private JButton filterSmoothSoft;
+    private JButton filterSmoothMedium;
+    private JButton filterSmoothHard;
+    private JButton filterInvert;
+    private JButton redRebalance;
+    private JButton greenRebalance;
+    private JButton blueRebalance;
+    private JButton btnRedOntoGreen;
+    private JButton btnGreenOntoBlue;
+    private JButton btnBlueOntoRed;
+    private JButton btnHueOntoSaturation;
+    private JButton btnSaturationOntoLightness;
+    private JButton btnLightnessOntoHue;
+
+
     public LeftSidebar() {
         super();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         JLabel lblGeneration = new JLabel("Generation");
-        JButton generateRandom = new JButton("Generate Random");
+        generateRandom = new JButton("Generate Random");
         generateRandom.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ImageScreen.currentImage = ImageGenerator.randomPixels(ImageScreen.currentImageHeight, ImageScreen.currentImageWidth);
+                if(remote) {
+                    try {
+                        ImageScreen.currentImage = GenerationConnector.requestGeneration(GenerationConnector.RANDOM_BITMAP, ImageScreen.currentImageHeight, ImageScreen.currentImageWidth);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                else {
+                    ImageScreen.currentImage = ImageGenerator.randomPixels(ImageScreen.currentImageHeight, ImageScreen.currentImageWidth);
+                }
                 ImageScreen.redraw();
             }
         });
 
-        JButton generateColour = new JButton("Generate Colour");
+        generateColour = new JButton("Generate Colour");
         generateColour.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ImageScreen.currentImage = (new RandomColorGeneration()).generate(ImageScreen.currentImageHeight, ImageScreen.currentImageWidth).getImage();
+                if(remote) {
+                    try {
+                        ImageScreen.currentImage = GenerationConnector.requestGeneration(GenerationConnector.RANDOM_COLOUR, ImageScreen.currentImageHeight, ImageScreen.currentImageWidth);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                else {
+                    ImageScreen.currentImage = (new RandomColorGeneration()).generate(ImageScreen.currentImageHeight, ImageScreen.currentImageWidth).getImage();
+                }
                 ImageScreen.redraw();
             }
         });
@@ -45,7 +87,7 @@ public class LeftSidebar extends JPanel {
 
         JLabel lblFilters = new JLabel("Filters");
 
-        JButton filterGrayscale = new JButton("Grayscale");
+        filterGrayscale = new JButton("Grayscale");
         filterGrayscale.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -54,7 +96,7 @@ public class LeftSidebar extends JPanel {
             }
         });
 
-        JButton filterSmoothSoft = new JButton("Smooth (soft)");
+        filterSmoothSoft = new JButton("Smooth (soft)");
         filterSmoothSoft.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -63,7 +105,7 @@ public class LeftSidebar extends JPanel {
             }
         });
 
-        JButton filterSmoothMedium = new JButton("Smooth (medium)");
+        filterSmoothMedium = new JButton("Smooth (medium)");
         filterSmoothMedium.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -72,7 +114,7 @@ public class LeftSidebar extends JPanel {
             }
         });
 
-        JButton filterSmoothHard = new JButton("Smooth (hard)");
+        filterSmoothHard = new JButton("Smooth (hard)");
         filterSmoothHard.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -81,7 +123,7 @@ public class LeftSidebar extends JPanel {
             }
         });
 
-        JButton filterInvert = new JButton("Invert");
+        filterInvert = new JButton("Invert");
         filterInvert.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -90,16 +132,7 @@ public class LeftSidebar extends JPanel {
             }
         });
 
-//        JButton spectrumMaping = new JButton("Spectrum Map");
-//        spectrumMaping.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                currentImage = ImageUtils.spectrumMaping(currentImage, new int[][] {new int[] {255, 0, 0}, new int[] {0, 255, 0}, new int[] {0, 0, 255}});
-//                redraw();
-//            }
-//        });
-
-        JButton redRebalance = new JButton("Rebalance Red");
+        redRebalance = new JButton("Rebalance Red");
         redRebalance.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -108,7 +141,7 @@ public class LeftSidebar extends JPanel {
             }
         });
 
-        JButton greenRebalance = new JButton("Rebalance Green");
+        greenRebalance = new JButton("Rebalance Green");
         greenRebalance.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -117,7 +150,7 @@ public class LeftSidebar extends JPanel {
             }
         });
 
-        JButton blueRebalance = new JButton("Rebalance Blue");
+        blueRebalance = new JButton("Rebalance Blue");
         blueRebalance.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -128,7 +161,7 @@ public class LeftSidebar extends JPanel {
 
         JLabel lblProjections = new JLabel("Spectrum Projections");
 
-        JButton btnRedOntoGreen = new JButton("Red -> Green");
+        btnRedOntoGreen = new JButton("Red -> Green");
         btnRedOntoGreen.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -137,7 +170,7 @@ public class LeftSidebar extends JPanel {
             }
         });
 
-        JButton btnGreenOntoBlue = new JButton("Green -> Blue");
+        btnGreenOntoBlue = new JButton("Green -> Blue");
         btnGreenOntoBlue.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -146,7 +179,7 @@ public class LeftSidebar extends JPanel {
             }
         });
 
-        JButton btnBlueOntoRed = new JButton("Blue -> Red");
+        btnBlueOntoRed = new JButton("Blue -> Red");
         btnBlueOntoRed.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -155,7 +188,7 @@ public class LeftSidebar extends JPanel {
             }
         });
 
-        JButton btnHueOntoSaturation = new JButton("Hue -> Saturation (red)");
+        btnHueOntoSaturation = new JButton("Hue -> Saturation (red)");
         btnHueOntoSaturation.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -164,7 +197,7 @@ public class LeftSidebar extends JPanel {
             }
         });
 
-        JButton btnSaturationOntoLightness = new JButton("Saturation -> Lightness");
+        btnSaturationOntoLightness = new JButton("Saturation -> Lightness");
         btnSaturationOntoLightness.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -173,20 +206,11 @@ public class LeftSidebar extends JPanel {
             }
         });
 
-        JButton btnLightnessOntoHue = new JButton("Lightness -> Hue");
+        btnLightnessOntoHue = new JButton("Lightness -> Hue");
         btnLightnessOntoHue.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ImageScreen.currentImage = ImageUtils.spectralProjection(ImageScreen.currentImage, "Lightness", "Hue");
-                ImageScreen.redraw();
-            }
-        });
-
-        JButton btnCustom = new JButton("Custom");
-        btnCustom.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ImageScreen.currentImage = ImageUtils.spectralProjection(ImageScreen.currentImage, "Red", "Hue");
                 ImageScreen.redraw();
             }
         });
@@ -224,7 +248,6 @@ public class LeftSidebar extends JPanel {
         add(btnHueOntoSaturation);
         add(btnSaturationOntoLightness);
         add(btnLightnessOntoHue);
-        add(btnCustom);
 
         // Center all buttons and labels of the left sidebar
         lblGeneration.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -247,7 +270,6 @@ public class LeftSidebar extends JPanel {
         btnHueOntoSaturation.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnSaturationOntoLightness.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLightnessOntoHue.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnCustom.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Set all button widths to full width of the left sidebar
         generateRandom.setMaximumSize(new Dimension(Integer.MAX_VALUE, generateRandom.getPreferredSize().height));
@@ -268,11 +290,46 @@ public class LeftSidebar extends JPanel {
         btnHueOntoSaturation.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnHueOntoSaturation.getPreferredSize().height));
         btnSaturationOntoLightness.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnSaturationOntoLightness.getPreferredSize().height));
         btnLightnessOntoHue.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnLightnessOntoHue.getPreferredSize().height));
-        btnCustom.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnCustom.getPreferredSize().height));
+    }
 
-
-
-
+    public void setRemote(boolean remote) {
+        if (remote) {
+            generateRandom.setVisible(true);
+            generateColour.setVisible(true);
+            filterGrayscale.setVisible(true);
+            filterSmoothSoft.setVisible(false);
+            filterSmoothMedium.setVisible(false);
+            filterSmoothHard.setVisible(false);
+            filterInvert.setVisible(true);
+            redRebalance.setVisible(false);
+            greenRebalance.setVisible(false);
+            blueRebalance.setVisible(false);
+            btnRedOntoGreen.setVisible(false);
+            btnGreenOntoBlue.setVisible(false);
+            btnBlueOntoRed.setVisible(false);
+            btnHueOntoSaturation.setVisible(false);
+            btnSaturationOntoLightness.setVisible(false);
+            btnLightnessOntoHue.setVisible(false);
+            this.remote = true;
+        } else {
+            generateRandom.setVisible(true);
+            generateColour.setVisible(true);
+            filterGrayscale.setVisible(true);
+            filterSmoothSoft.setVisible(true);
+            filterSmoothMedium.setVisible(true);
+            filterSmoothHard.setVisible(true);
+            filterInvert.setVisible(true);
+            redRebalance.setVisible(true);
+            greenRebalance.setVisible(true);
+            blueRebalance.setVisible(true);
+            btnRedOntoGreen.setVisible(true);
+            btnGreenOntoBlue.setVisible(true);
+            btnBlueOntoRed.setVisible(true);
+            btnHueOntoSaturation.setVisible(true);
+            btnSaturationOntoLightness.setVisible(true);
+            btnLightnessOntoHue.setVisible(true);
+            this.remote = false;
+        }
     }
 
 }

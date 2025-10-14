@@ -7,24 +7,20 @@ import com.utils.Util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.Scanner;
 
-public class GenerationConnector {
+public class FilterConnector {
 
-    public static final String RANDOM_BITMAP = "randomBitmap";
-    public static final String RANDOM_COLOUR = "randomColour";
+    public static final String FILTER_GRAYSCALE = "grayscale";
+    public static final String FILTER_INVERT = "invert";
 
     public static BitMapImage requestGeneration(String type, int height, int width) throws IOException, InterruptedException {
 
         String remote = ConnectionScreen.getInstance().getRemote();
-        URL url = new URL(remote + "/generate?type=" + type + "&height=" + height +"&width=" + width);
+        URL url = new URL(remote + "/filter?type=" + type);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
+        conn.setRequestMethod("POST");
 
         InputStream input = conn.getInputStream();
         Scanner scanner = new Scanner(input).useDelimiter("\\A");

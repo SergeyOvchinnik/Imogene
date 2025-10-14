@@ -1,6 +1,7 @@
 package com.backend;
 
 import com.GA.ImageGenerator;
+import com.GA.generation.RandomColorGeneration;
 import com.application.panels.ImageScreen;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -72,8 +73,8 @@ public class BackendApplication {
                 if(type.equalsIgnoreCase("randomBitmap"))
                     image = ImageGenerator.randomPixels(height, width);
 
-                if(type.equalsIgnoreCase("randomBitmap"))
-                    image = ImageGenerator.randomPixels(height, width);
+                if(type.equalsIgnoreCase("randomColour"))
+                    image = (new RandomColorGeneration()).generate(ImageScreen.currentImageHeight, ImageScreen.currentImageWidth).getImage();
 
 
                 String json = Util.arrayToJson(image.getRgb());

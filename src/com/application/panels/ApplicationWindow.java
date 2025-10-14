@@ -60,9 +60,13 @@ public class ApplicationWindow extends JFrame {
         // Main application screen with the image view and sidebars
         JPanel imageScreen = ImageScreen.getInstance();
 
+        // Screen where the connection parameter is selected
+        JPanel connectionScreen = ConnectionScreen.getInstance();
+
         // Assemble the card layout
         cards.add(modeScreen, "Mode");
         cards.add(imageScreen, "Image");
+        cards.add(connectionScreen,"Connection");
         add(cards);
 
         // Display the first card
