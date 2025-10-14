@@ -2,6 +2,9 @@ package com.GA.fitness;
 
 import com.GA.IndividualImage;
 
+/**
+ * A fitness function that rewards images that have high colour differences between adjacent pixels
+ */
 public class CheckerboardFitness extends FitnessFunction {
 
     @Override
