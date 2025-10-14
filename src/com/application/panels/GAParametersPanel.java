@@ -28,11 +28,9 @@ public class GAParametersPanel extends JPanel {
     // Names of all available generation functions
     private static final String GENERATION_FUNCTION_RANDOM_PIXELS = "Random Pixels";
     private static final String GENERATION_FUNCTION_RANDOM_COLOUR = "Random Colour";
-    private static final String GENERATION_FUNCTION_FIRE_MAP = "Fire Map";
     private static final String[] GENERATION_FUNCTIONS = new String[] {
             GENERATION_FUNCTION_RANDOM_PIXELS,
-            GENERATION_FUNCTION_RANDOM_COLOUR,
-            GENERATION_FUNCTION_FIRE_MAP
+            GENERATION_FUNCTION_RANDOM_COLOUR
     };
 
     // Names of all available fitness functions
@@ -57,6 +55,7 @@ public class GAParametersPanel extends JPanel {
             SELECTION_FUNCTION_TOURNAMENT
     };
 
+    // Names of all available crossover functions
     private static final String CROSSOVER_FUNCTION_PIXELWISE_RGB = "Pixelwise RGB";
     private static final String CROSSOVER_FUNCTION_PIXELWISE_HSL = "Pixelwise HSL";
     private static final String CROSSOVER_FUNCTION_PIXELWISE_STRONG = "Strong Pixelwise";
@@ -66,6 +65,7 @@ public class GAParametersPanel extends JPanel {
             CROSSOVER_FUNCTION_PIXELWISE_STRONG
     };
 
+    // Names of all  available mutation functions
     private static final String MUTATION_FUNCTION_RANDOM_PIXELS_RANDOMIZATION = "Random Pixels Randomization";
     private static final String MUTATION_FUNCTION_RANDOM_PIXELS_ADJUSTMENT = "Random Pixels Adjustment";
     private static final String MUTATION_FUNCTION_STRONG = "Strong pixel adjustments";

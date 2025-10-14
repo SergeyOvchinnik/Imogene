@@ -31,8 +31,6 @@ public class GenerationConnector {
         String response = scanner.hasNext() ? scanner.next() : "";
         scanner.close();
 
-        System.out.println("Received array JSON length: " + response.length());
-
         int[][][] rgb = Util.parse3DArray(response);
 
         return new BitMapImage(rgb);

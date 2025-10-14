@@ -1,13 +1,18 @@
 package com.API;
 
 import com.application.panels.ConnectionScreen;
+import com.application.panels.ImageScreen;
 import com.utils.BitMapImage;
 import com.utils.Util;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Scanner;
 
 public class FilterConnector {
@@ -15,21 +20,27 @@ public class FilterConnector {
     public static final String FILTER_GRAYSCALE = "grayscale";
     public static final String FILTER_INVERT = "invert";
 
-    public static BitMapImage requestGeneration(String type, int height, int width) throws IOException, InterruptedException {
+    public static BitMapImage requestFilter(String type, BitMapImage image) throws IOException, InterruptedException {
 
         String remote = ConnectionScreen.getInstance().getRemote();
-        URL url = new URL(remote + "/filter?type=" + type);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("POST");
 
-        InputStream input = conn.getInputStream();
-        Scanner scanner = new Scanner(input).useDelimiter("\\A");
-        String response = scanner.hasNext() ? scanner.next() : "";
-        scanner.close();
+        String imageJson = Util.arrayToJson(image.getRgb());
 
-        System.out.println("Received array JSON length: " + response.length());
+        String jsonBody = String.format("{\"type\":\"grayscale\",\"image\":\"%s\"}", imageJson);
 
-        int[][][] rgb = Util.parse3DArray(response);
+        // Send request
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(remote + "/filter"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        String imageString = response.body();
+
+        int[][][] rgb = Util.parse3DArray(imageString);
 
         return new BitMapImage(rgb);
     }

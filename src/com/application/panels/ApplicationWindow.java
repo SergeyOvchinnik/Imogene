@@ -28,32 +28,6 @@ public class ApplicationWindow extends JFrame {
         setSize(1500, 800);
         setLocationRelativeTo(null);
 
-//        KeyStroke ctrlPlus = KeyStroke.getKeyStroke(KeyEvent.VK_PLUS,
-//                Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
-//
-//        // Ctrl + Minus → decrease font
-//        KeyStroke ctrlMinus = KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,
-//                Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
-//
-//        JRootPane root = this.getRootPane();
-//
-//        // Register actions
-//        root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(ctrlPlus, "increaseFont");
-//        root.getActionMap().put("increaseFont", new AbstractAction() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                FontManager.increaseFontSize();
-//            }
-//        });
-//
-//        root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(ctrlMinus, "decreaseFont");
-//        root.getActionMap().put("decreaseFont", new AbstractAction() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                FontManager.decreaseFontSize();
-//            }
-//        });
-
         // Card for choosing to run the application locally or connect to a remote backend
         JPanel modeScreen = ModeScreen.getInstance();
 

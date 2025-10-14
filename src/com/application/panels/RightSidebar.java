@@ -60,8 +60,4 @@ public class RightSidebar extends JPanel {
 
     }
 
-    public void makeRemote() {
-
-    }
-
 }

@@ -1,5 +1,6 @@
 package com.application.panels;
 
+import com.API.FilterConnector;
 import com.API.GenerationConnector;
 import com.GA.ImageGenerator;
 import com.GA.generation.RandomColorGeneration;
@@ -91,7 +92,16 @@ public class LeftSidebar extends JPanel {
         filterGrayscale.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ImageScreen.currentImage = ImageUtils.grayscale(ImageScreen.currentImage);
+                if(remote) {
+                    try {
+                        ImageScreen.currentImage = FilterConnector.requestFilter(FilterConnector.FILTER_GRAYSCALE, ImageScreen.currentImage);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                else {
+                    ImageScreen.currentImage = ImageUtils.grayscale(ImageScreen.currentImage);
+                }
                 ImageScreen.redraw();
             }
         });
@@ -127,7 +137,16 @@ public class LeftSidebar extends JPanel {
         filterInvert.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ImageScreen.currentImage = ImageUtils.invert(ImageScreen.currentImage);
+                if(remote) {
+                    try {
+                        ImageScreen.currentImage = FilterConnector.requestFilter(FilterConnector.FILTER_INVERT, ImageScreen.currentImage);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                else {
+                    ImageScreen.currentImage = ImageUtils.invert(ImageScreen.currentImage);
+                }
                 ImageScreen.redraw();
             }
         });
